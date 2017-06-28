@@ -17,7 +17,7 @@
 #'
 #' @import raster
 #' @import landscapeR
-#' @author Antonio J Pérez-Luque
+#' @author Antonio J Perez-Luque
 
 
 createLandscape <- function(r, size_pp, n_nf, size_nf){

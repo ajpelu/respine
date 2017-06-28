@@ -30,5 +30,5 @@ Landscape function
 
 }
 \author{
-Antonio J Pérez-Luque
+Antonio J Perez-Luque
 }
