@@ -9,14 +9,9 @@ Description: App to show the resilience of mediterranean pine plantations under
   a global change scenario. 
 Imports: 
   raster,
-  landscapeR,
-  Rdpack
-Suggests:
-  knitr
+  landscapeR
 License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/ajpelu/respine/ 
 BugReports: https://github.com/ajpelu/respine/issues
 RoxygenNote: 6.0.1
-RdMacros: Rdpack
-VignetteBuilder: knitr
