@@ -22,10 +22,9 @@ A raster object with the landscape confifured
 Landscape function
 }
 \examples{
-m <- matrix(nrow=100, ncol=200, byrow = TRUE)
-r <- raster(m)
-extent(r) <- matrix(c(0, 0, 200, 100), nrow=2)
-r[] <- 0
-myl <- createLandscape(r, size_pp = 1000, size_nf = 500, n_nf = 4)
-plot(myl)
+# m <- matrix(nrow=100, ncol=200, byrow = TRUE)
+# r <- raster(m)
+# extent(r) <- matrix(c(0, 0, 200, 100), nrow=2)
+# r[] <- 0
+# myl <- createLandscape(r, size_pp = 1000, size_nf = 500, n_nf = 4)
 }
