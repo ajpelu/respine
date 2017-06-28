@@ -1,11 +1,12 @@
 Package: respine
 Type: Package
-Title: Evaluate RESilience of Mediterranean PINE plantations (respine)
+Title: Evaluate RESilience of Mediterranean PINE plantations
 Version: 0.1.0
 Date: 2017-06-20
 Author: Antonio J Pérez-Luque <ajperez@go.ugr.es>
 Maintainer: Antonio J Pérez-Luque <ajperez@go.ugr.es>
-Description: App to show the resilience of mediterranean pine plantations under a global change scenario
+Description: App to show the resilience of mediterranean pine plantations under 
+  a global change scenario. 
 Imports: 
   raster,
   landscapeR
