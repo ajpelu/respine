@@ -3,7 +3,7 @@ title: "Vignette Title"
 author: "Vignette Author"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
-bibliography: references.bib 
+bibliography: REFERENCES.bib 
 csl: ecology.csl
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
