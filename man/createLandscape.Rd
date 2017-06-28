@@ -7,16 +7,16 @@
 createLandscape(r, size_pp, n_nf, size_nf)
 }
 \arguments{
-\item{r}{A raster object}
+\item{r}{A \code{raster} object}
 
-\item{size_pp}{The size of pine plantations expressed as number of pixels (integer)}
+\item{size_pp}{The size of pine plantations expressed as number of pixels (\code{integer})}
 
-\item{n_nf}{Number of patchs of Natural forests (a number between 1 and 5)}
+\item{n_nf}{Number of patchs of Natural forests (\code{integer} between 1 and 5)}
 
-\item{size_nf}{The size of natural forest patchs (a value between 10 and 500)}
+\item{size_nf}{The size of natural forest patchs (\code{numeric} value between 10 and 500)}
 }
 \value{
-A raster object with the landscape confifured
+A \code{raster} object with the landscape confifured
 }
 \description{
 Landscape function
@@ -27,4 +27,8 @@ Landscape function
 # extent(r) <- matrix(c(0, 0, 200, 100), nrow=2)
 # r[] <- 0
 # myl <- createLandscape(r, size_pp = 1000, size_nf = 500, n_nf = 4)
+
+}
+\author{
+Antonio J Pérez-Luque
 }
