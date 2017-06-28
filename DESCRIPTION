@@ -5,6 +5,9 @@ Version: 0.1
 Author: Antonio J Pérez-Luque <ajperez@go.ugr.es>
 Maintainer: Antonio J Pérez-Luque <ajperez@go.ugr.es>
 Description: App to show the resilience of mediterranean pine plantations under a global change scenario
-License: What license is it under?
+Date: 2017-06-20
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/ajpelu/respine/ 
+BugReports: https://github.com/ajpelu/respine/issues
