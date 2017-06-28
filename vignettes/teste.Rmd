@@ -2,9 +2,7 @@
 title: "Vignette Title"
 author: "Vignette Author"
 date: "`r Sys.Date()`"
-output: 
-  md_document:
-    variant: markdown_github
+output: rmarkdown::html_vignette
 bibliography: references.bib 
 csl: ecology.csl
 vignette: >
