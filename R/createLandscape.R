@@ -15,6 +15,8 @@
 #' # r[] <- 0
 #' # myl <- createLandscape(r, size_pp = 1000, size_nf = 500, n_nf = 4)
 #'
+#' @import raster
+#' @import landscapeR
 #' @author Antonio J Pérez-Luque
 
 
