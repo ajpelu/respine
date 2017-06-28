@@ -5,7 +5,7 @@
 #' @param size_nf The size of natural forest patchs (a value between 10 and 500)
 #' @return A raster object with the landscape confifured
 #' @examples
-#' m <- matrix(nrow=100, ncol=200, byrow = T)
+#' m <- matrix(nrow=100, ncol=200, byrow = TRUE)
 #' r <- raster(m)
 #' extent(r) <- matrix(c(0, 0, 200, 100), nrow=2)
 #' r[] <- 0
@@ -14,9 +14,6 @@
 
 
 createLandscape <- function(r, size_pp, n_nf, size_nf){
-  require('raster')
-  require('landscapeR')
-
   # Create pine plantation patch
   pp <- makeClass(r, val=1, npatch = 1, rast=TRUE,
                   size = size_pp,
