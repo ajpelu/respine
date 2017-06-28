@@ -11,3 +11,4 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/ajpelu/respine/ 
 BugReports: https://github.com/ajpelu/respine/issues
+RoxygenNote: 6.0.1
