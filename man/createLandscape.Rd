@@ -22,7 +22,7 @@ A raster object with the landscape confifured
 Landscape function
 }
 \examples{
-m <- matrix(nrow=100, ncol=200, byrow = T)
+m <- matrix(nrow=100, ncol=200, byrow = TRUE)
 r <- raster(m)
 extent(r) <- matrix(c(0, 0, 200, 100), nrow=2)
 r[] <- 0
