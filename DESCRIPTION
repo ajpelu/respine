@@ -12,12 +12,7 @@ Imports:
   landscapeR,
   Rdpack
 Suggests:
-  knitr,
-  rmarkdown,
-  tidyverse,
-  tidyr,
-  dplyr,
-  ggplot2
+  knitr
 License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/ajpelu/respine/ 
