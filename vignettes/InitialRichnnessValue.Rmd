@@ -1,10 +1,22 @@
+---
+title: "Set initial value of Richness"
+author: "Antonio J Perez-Luque"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, message=FALSE}
 library("rgbif")
 library("rgdal")
 library("sp")
 library("raster")
 library("dplyr")
 library("sf")
-
+```
 
 ## uuid of Sinfonevada
 sinfo_uuid <- 'db6cd9d7-7be5-4cd0-8b3c-fb6dd7446472'
@@ -64,5 +76,6 @@ richnes_by_eco <- aux %>%
             max = max(rich)) %>%
   as.data.frame() %>%
   dplyr::select(-geometry)
+
 
 
