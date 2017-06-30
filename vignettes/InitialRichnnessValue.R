@@ -32,7 +32,7 @@
 #  wd <- getwd()
 #  
 #  temporalwd <- setwd(tempdir())
-#  unzip('../data/ecosistemas_sn.zip', exdir = temporalwd)
+#  unzip('../inst/extdata/ecosistemas_sn.zip', exdir = temporalwd)
 #  
 #  eco <- readOGR(dsn=temporalwd, layer = 'ecosistemas', encoding="UTF-8", verbose = TRUE)
 #  

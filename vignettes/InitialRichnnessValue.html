@@ -124,7 +124,7 @@ richness_loc &lt;-<span class="st"> </span>df %&gt;%
 wd &lt;-<span class="st"> </span><span class="kw">getwd</span>()
 
 temporalwd &lt;-<span class="st"> </span><span class="kw">setwd</span>(<span class="kw">tempdir</span>())
-<span class="kw">unzip</span>(<span class="st">'../data/ecosistemas_sn.zip'</span>, <span class="dt">exdir =</span> temporalwd)
+<span class="kw">unzip</span>(<span class="st">'../inst/extdata/ecosistemas_sn.zip'</span>, <span class="dt">exdir =</span> temporalwd)
 
 eco &lt;-<span class="st"> </span><span class="kw">readOGR</span>(<span class="dt">dsn=</span>temporalwd, <span class="dt">layer =</span> <span class="st">'ecosistemas'</span>, <span class="dt">encoding=</span><span class="st">&quot;UTF-8&quot;</span>, <span class="dt">verbose =</span> <span class="ot">TRUE</span>)
 

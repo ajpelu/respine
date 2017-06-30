@@ -24,9 +24,9 @@ computed using the equations provided by Gomez-Aparicio et al. (2009). See
 Equation 1 and Appendix A2 of this paper.
 }
 \details{
-Gómez-Aparicio L, Zavala MA, Bonet FJ, Zamora R (2009) Are pine plantations
+Gomez-Aparicio L, Zavala MA, Bonet FJ, Zamora R (2009) Are pine plantations
 valid tools for restoring Mediterranean forests? An assessment along abiotic
-and biotic gradients. Ecological Applications, 19: 2124–2141.
+and biotic gradients. Ecological Applications, 19: 2124 - 2141.
 }
 \references{
 \url{https://dx.doi.org/10.1890/08-1656.1}
