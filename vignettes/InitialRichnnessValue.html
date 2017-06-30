@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Antonio J Perez-Luque" />
+
+<meta name="date" content="2017-06-30" />
+
+<title>Set initial value of Richness</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Set initial value of Richness</h1>
+<h4 class="author"><em>Antonio J Perez-Luque</em></h4>
+<h4 class="date"><em>2017-06-30</em></h4>
+
+
+
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;rgbif&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;rgdal&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;sp&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;raster&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;dplyr&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;sf&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;knitr&quot;</span>)</code></pre></div>
+<p>Para establecer los valores iniciales de riqueza en cada uno de los tipos de cobertura vegetal vamos a analizar los datos de campo procedentes de los inventarios forestales SINFONEVADA <span class="citation">(Pérez-Luque et al. 2014)</span>. Para ello consultaremos este <a href="http://www.gbif.org/dataset/db6cd9d7-7be5-4cd0-8b3c-fb6dd7446472">conjunto de datos</a> en GBIF donde está documentado.</p>
+<p>El objetivo es <strong><em>obtener una tabla de riqueza por ecosistema</em></strong>. Los pasos que realizaremos son:</p>
+<ul>
+<li>Estudiar el conjunto de datos. Consultar el identificador único (<code>uuid</code>) del dataset: <code>db6cd9d7-7be5-4cd0-8b3c-fb6dd7446472</code></li>
+<li>Descargar el dataset</li>
+<li>Obtener los valores de riqueza por ecosistema. Para ello utilizaremos el mapa de ecosistemas generado por el <a href="www.obsnev.es">Observatorio de Cambio Global de Sierra Nevada</a> <span class="citation">(Bonet et al. 2010)</span></li>
+</ul>
+<div id="obtener-el-conjunto-de-datos" class="section level3">
+<h3>Obtener el conjunto de datos</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">### uuid of Sinfonevada
+sinfo_uuid &lt;-<span class="st"> 'db6cd9d7-7be5-4cd0-8b3c-fb6dd7446472'</span>
+
+### See metadata
+sinfo_meta &lt;-<span class="st"> </span><span class="kw">datasets</span>(<span class="dt">uuid =</span> sinfo_uuid)
+
+<span class="co"># Get table of ocurrences</span>
+sf &lt;-<span class="st"> </span><span class="kw">occ_data</span>(<span class="dt">datasetKey=</span>sinfo_meta$data$key, <span class="dt">limit =</span> <span class="dv">8000</span>)</code></pre></div>
+</div>
+<div id="numero-de-plots-y-especies-por-plot" class="section level3">
+<h3>Numero de plots y especies por plot</h3>
+<ul>
+<li>Obtendremos el numero de plots (agrupando por localización)</li>
+<li>Para cada plot calcularemos la riqueza de especies</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Get only the fields of interest  </span>
+df &lt;-<span class="st"> </span>sf$data %&gt;%<span class="st"> </span>dplyr::<span class="kw">select</span>(decimalLatitude, decimalLongitude, scientificName)
+
+<span class="co"># How many species by plot</span>
+richness_loc &lt;-<span class="st"> </span>df %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(decimalLatitude, decimalLongitude) %&gt;%
+<span class="st">  </span><span class="kw">count</span>() %&gt;%<span class="st"> </span>tibble::<span class="kw">rownames_to_column</span>(<span class="dt">var=</span><span class="st">'id_plot'</span>) %&gt;%<span class="st"> </span><span class="kw">data.frame</span>() %&gt;%
+<span class="st">  </span><span class="kw">rename</span>(<span class="dt">rich =</span> n)</code></pre></div>
+</div>
+<div id="riqueza-por-ecosistemas" class="section level3">
+<h3>Riqueza por ecosistemas</h3>
+<ul>
+<li>Analizaremos la riqueza media de los plots por ecosistema</li>
+<li>Obtener los ecosistemas de OBSNEV, que están en este <a href="https://www.dropbox.com/s/urcbafyczvqv7o1/ecosistemas_sn.zip?dl=0">enlace</a>. También se han incluido en la carpeta <code>/data</code> del paquete.</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Prepare Ecosystems data </span>
+wd &lt;-<span class="st"> </span><span class="kw">getwd</span>()
+
+temporalwd &lt;-<span class="st"> </span><span class="kw">setwd</span>(<span class="kw">tempdir</span>())
+<span class="kw">unzip</span>(<span class="st">'../data/ecosistemas_sn.zip'</span>, <span class="dt">exdir =</span> temporalwd)
+
+eco &lt;-<span class="st"> </span><span class="kw">readOGR</span>(<span class="dt">dsn=</span>temporalwd, <span class="dt">layer =</span> <span class="st">'ecosistemas'</span>, <span class="dt">encoding=</span><span class="st">&quot;UTF-8&quot;</span>, <span class="dt">verbose =</span> <span class="ot">TRUE</span>)
+
+<span class="co"># Transform projection</span>
+eco_t &lt;-<span class="st"> </span><span class="kw">spTransform</span>(eco, <span class="kw">CRS</span>(<span class="st">&quot;+init=epsg:4326&quot;</span>))</code></pre></div>
+<p>Ahora creamos una capa vectorial de puntos para los plots del invetnario forestal, y le asignamos su correspondiente proyección.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create an spatial point dataframe for the plots </span>
+richness_sp &lt;-<span class="st"> </span><span class="kw">SpatialPointsDataFrame</span>(richness_loc[,<span class="kw">c</span>(<span class="st">&quot;decimalLongitude&quot;</span>, <span class="st">&quot;decimalLatitude&quot;</span>)],
+                                      richness_loc)
+<span class="kw">projection</span>(richness_sp) &lt;-<span class="st">  </span><span class="kw">CRS</span>(<span class="st">&quot;+init=epsg:4326&quot;</span>)</code></pre></div>
+<p>Seguidamente realizamos una intersección entre capas. Estamos interesados en obtener la tipología de ecosistema para cada plot del inventario forestal.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># See this example</span>
+<span class="co"># https://gis.stackexchange.com/questions/226035/join-spatial-point-data-with-multiple-polygon-data-using-r</span>
+
+<span class="co"># Convert to sf-objects</span>
+richness_sp.sf &lt;-<span class="st"> </span><span class="kw">st_as_sf</span>(richness_sp)
+eco_t.sf &lt;-<span class="st"> </span><span class="kw">st_as_sf</span>(eco_t)
+
+<span class="co"># Keep all &quot;meuse.sf&quot;, sort by row.names(meuse.sf). Default overlay is &quot;intersects&quot;.</span>
+aux &lt;-<span class="st"> </span><span class="kw">st_join</span>(richness_sp.sf, eco_t.sf[,<span class="kw">c</span>(<span class="st">'COD_ECOSIS'</span>, <span class="st">'ECOSISTE_1'</span>)])
+
+<span class="co"># Convert back to Spatial*</span>
+richness_sp_eco &lt;-<span class="st"> </span><span class="kw">as</span>(aux, <span class="st">&quot;Spatial&quot;</span>)</code></pre></div>
+<p>Vamos a reagrupar los ecosistemas</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aux &lt;-<span class="st"> </span>aux %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">newECO =</span> <span class="kw">recode_factor</span>(COD_ECOSIS, 
+                                                    <span class="st">`</span><span class="dt">8</span><span class="st">`</span>=<span class="st">&quot;Pine plantations&quot;</span>,
+                                                    <span class="st">`</span><span class="dt">2</span><span class="st">`</span>=<span class="st">&quot;High-mountain meadows&quot;</span>,
+                                                    <span class="st">`</span><span class="dt">3</span><span class="st">`</span>=<span class="st">&quot;High-mountain shrubland&quot;</span>,
+                                                    <span class="st">`</span><span class="dt">5</span><span class="st">`</span>=<span class="st">&quot;Mid-mountain shrubland&quot;</span>,
+                                                    <span class="st">`</span><span class="dt">1</span><span class="st">`</span>=<span class="st">&quot;Pastures&quot;</span>,
+                                                    <span class="st">`</span><span class="dt">6</span><span class="st">`</span>=<span class="st">&quot;Aquatic systems&quot;</span>, 
+                                                    <span class="st">`</span><span class="dt">NA</span><span class="st">`</span>=<span class="st">&quot;NA&quot;</span>, 
+                                                    <span class="dt">.default =</span> <span class="st">'Natural Forests'</span>))
+
+aux &lt;-<span class="st"> </span>aux %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">ECOSISTE_1 =</span> <span class="kw">recode_factor</span>(ECOSISTE_1,
+         <span class="st">`</span><span class="dt">Matorral de alta monta\361a (enebrales, sabinales, piornales)</span><span class="st">`</span> =
+<span class="st">           &quot;Matorral de alta montana (enebrales, sabinales, piornales)&quot;</span>,
+         <span class="st">`</span><span class="dt">Matorrales de media monta\361a (retamares, tomillares, etc.)</span><span class="st">`</span>=<span class="st"> </span>
+<span class="st">           &quot;Matorrales de media montana (retamares, tomillares, etc.)&quot;</span>,
+         <span class="st">`</span><span class="dt">Pastos de media monta\361aMaSis</span><span class="st">`</span> =<span class="st"> &quot;Pastos de media montana&quot;</span>,
+         <span class="st">`</span><span class="dt">Pinares aut\363ctonos de P. sylvestris</span><span class="st">`</span> =<span class="st"> &quot;Pinares autoctonos de P. sylvestris&quot;</span>,
+         <span class="st">`</span><span class="dt">Pinares aut\363ctonos sobre dolom\355as</span><span class="st">`</span> =<span class="st"> &quot;Pinares autoctonos sobre dolomias&quot;</span>,
+         <span class="st">`</span><span class="dt">Repoblaciones de con\355feras</span><span class="st">`</span>=<span class="st"> &quot;Repoblaciones de coniferas&quot;</span>,
+         <span class="st">`</span><span class="dt">Sistemas acu\341ticos</span><span class="st">`</span> =<span class="st"> &quot;Sistemas acuaticos&quot;</span>)) </code></pre></div>
+<p>Finalmente computamos los valores de riqueza por ecosistemas y por agregados</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">richSinfo &lt;-<span class="st"> </span>aux %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(ECOSISTE_1, COD_ECOSIS) %&gt;%
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">mean =</span> <span class="kw">mean</span>(rich),
+            <span class="dt">sd =</span> <span class="kw">sd</span>(rich),
+            <span class="dt">se =</span> sd/<span class="kw">sqrt</span>(<span class="kw">length</span>(rich)),
+            <span class="dt">n =</span> <span class="kw">length</span>(rich),
+            <span class="dt">min =</span> <span class="kw">min</span>(rich),
+            <span class="dt">max =</span> <span class="kw">max</span>(rich),
+            <span class="dt">median =</span> <span class="kw">median</span>(rich)) %&gt;%
+<span class="st">    </span><span class="kw">as.data.frame</span>() %&gt;%
+<span class="st">  </span>dplyr::<span class="kw">select</span>(-geometry) </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">richSinfo_agg &lt;-<span class="st"> </span>aux %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(newECO) %&gt;%
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">mean =</span> <span class="kw">mean</span>(rich),
+            <span class="dt">sd =</span> <span class="kw">sd</span>(rich),
+            <span class="dt">se =</span> sd/<span class="kw">sqrt</span>(<span class="kw">length</span>(rich)),
+            <span class="dt">n =</span> <span class="kw">length</span>(rich),
+            <span class="dt">min =</span> <span class="kw">min</span>(rich),
+            <span class="dt">max =</span> <span class="kw">max</span>(rich), 
+            <span class="dt">median =</span> <span class="kw">median</span>(rich)) %&gt;%
+<span class="st">  </span><span class="kw">as.data.frame</span>() %&gt;%
+<span class="st">  </span>dplyr::<span class="kw">select</span>(-geometry) </code></pre></div>
+<p>En <span class="citation">(Gómez-Aparicio et al. 2009)</span> se analizan el mismo dataset, y se obtienen, tras aplicar los modelos, los siguientes resultados:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">richPot &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(
+  <span class="dt">eco =</span> <span class="kw">c</span>(<span class="st">'Plantations'</span>, <span class="st">'Quercus ilex forests'</span>, <span class="st">'Natural deciduous forests'</span>),
+  <span class="dt">n =</span> <span class="kw">c</span>(<span class="dv">442</span>, <span class="dv">45</span>, <span class="dv">26</span>),
+  <span class="dt">potRich =</span> <span class="kw">c</span>(<span class="fl">13.09</span>, <span class="fl">14.92</span>, <span class="fl">17.55</span>),
+  <span class="dt">lowerInterval =</span> <span class="kw">c</span>(<span class="fl">12.82</span>, <span class="fl">13.72</span>, <span class="fl">15.62</span>), 
+  <span class="dt">upperInterval =</span> <span class="kw">c</span>(<span class="fl">13.34</span>, <span class="fl">16.11</span>, <span class="fl">19.66</span>)))</code></pre></div>
+<div id="refs" class="references">
+<div id="ref-Bonet2010">
+<p>Bonet, F. J., A. J. Pérez-Luque, R. Moreno, and R. Zamora. 2010. Sierra Nevada Global Change Observatory. Structure and Basic Data. Consejería de Medio Ambiente, Junta de Andalucía.</p>
+</div>
+<div id="ref-GomezAparicio2009">
+<p>Gómez-Aparicio, L., M. A. Zavala, F. J. Bonet, and R. Zamora. 2009. Are pine plantations valid tools for restoring mediterranean forests? An assessment along abiotic and biotic gradients. Ecological Applications 19:2124–2141.</p>
+</div>
+<div id="ref-PerezLuque2014">
+<p>Pérez-Luque, A. J., F. J. Bonet, R. Pérez-Pérez, R. Aspizua, J. Lorite, and R. Zamora. 2014. Sinfonevada: Dataset of floristic diversity in sierra nevada forests (se spain). PhytoKeys 35:1–15.</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
