@@ -18,6 +18,8 @@ range of Richness: See Gomez-Aparicio et al 2009)}
 
 \item{pastUse}{the past land use of the pine plantation (\code{character}).
 One of "Oak", "Shrubland", "Pasture" or "Crop"}
+
+\item{rescale}{If "TRUE" the results are rescaled}
 }
 \value{
 A \code{raster} object with values of initial Richness for each
@@ -27,7 +29,7 @@ pixel.
 Esta funcion establece los valores iniciales de riqueza de especies
 }
 \references{
-Gómez-Aparicio L, Zavala MA, Bonet FJ, Zamora R (2009) Are pine plantations
+Gomez-Aparicio L, Zavala MA, Bonet FJ, Zamora R (2009) Are pine plantations
 valid tools for restoring Mediterranean forests? An assessment along abiotic
 and biotic gradients. Ecological Applications, 19: 2124–2141.
 }

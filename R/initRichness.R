@@ -3,21 +3,24 @@
 #' Esta funcion establece los valores iniciales de riqueza de especies
 #'
 #' @param r A \code{raster} object
+#'
 #' @param r_range A \code{data frame} with three columns: \code{value} of land use
 #' (\code{integer}: 0 = "Other", 1 = "Pine plantation", 2 = "Natural Forests",
 #' 3 = "Crop"); \code{lowRich} and \code{upRich} (lower an upper value of the
 #' range of Richness: See Gomez-Aparicio et al 2009)
 #'
 #' @param treedensity density of the pine plantation (\code{integer})
+#'
 #' @param pastUse the past land use of the pine plantation (\code{character}).
 #' One of "Oak", "Shrubland", "Pasture" or "Crop"
+#' @param rescale If "TRUE" the results are rescaled
 #'
 #' @return A \code{raster} object with values of initial Richness for each
 #' pixel.
 #'
 #' @references
 #'
-#' Gómez-Aparicio L, Zavala MA, Bonet FJ, Zamora R (2009) Are pine plantations
+#' Gomez-Aparicio L, Zavala MA, Bonet FJ, Zamora R (2009) Are pine plantations
 #' valid tools for restoring Mediterranean forests? An assessment along abiotic
 #' and biotic gradients. Ecological Applications, 19: 2124–2141.
 #'
@@ -38,7 +41,7 @@ initRichness <- function(r, r_range, treedensity, pastUse, rescale=TRUE){
   # Pine plantations
   # R ~ potR * (0.3*(pastUSE) + 0.7*(treeDensity))
 
-  # Fraction of Potential Richness (tree Density Eq. 3 Gómez Aparicio et al. 2009)
+  # Fraction of Potential Richness (tree Density Eq. 3 Gomez Aparicio et al. 2009)
   ftreeden <- exp(-0.5*((treedensity - 0.22)/1504.1)^2)
 
   # Past Land Use
