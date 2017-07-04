@@ -6,6 +6,7 @@ library('RColorBrewer')
 library('sp')
 library('rgeos')
 
+
 ## --> Este codigo solo se ejecuta una vez
 
 # Crear landscape vacío
@@ -15,7 +16,7 @@ r <- raster(m)
 extent(r) <- matrix(c(0, 0, 200, 100), nrow=2)
 r[] <- 0
 
-source('createLandscape.R')
+source('createLandscape.R', local=TRUE)
 
 
 shinyServer(
