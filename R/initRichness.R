@@ -13,6 +13,7 @@
 #'
 #' @param pastUse the past land use of the pine plantation (\code{character}).
 #' One of "Oak", "Shrubland", "Pasture" or "Crop"
+#'
 #' @param rescale If "TRUE" the results are rescaled
 #'
 #' @return A \code{raster} object with values of initial Richness for each
@@ -29,7 +30,7 @@
 initRichness <- function(r, r_range, treedensity, pastUse, rescale=TRUE){
 
   # Natural forest (2)
-  aux <- r_range[which(auxdf$value == 2), ]
+  aux <- r_range[which(r_range$value == 2), ]
 
   r[r == 2]  <- sample(aux$lowRich:aux$upRich,
                        ncell(r[r==2]), replace = TRUE)
