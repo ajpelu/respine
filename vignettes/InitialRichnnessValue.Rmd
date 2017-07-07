@@ -55,8 +55,10 @@ df <- sf$data %>% dplyr::select(decimalLatitude, decimalLongitude, scientificNam
 
 # How many species by plot
 richness_loc <- df %>%
-  group_by(decimalLatitude, decimalLongitude) %>%
-  count() %>% tibble::rownames_to_column(var='id_plot') %>% data.frame() %>%
+  group_by(decimalLatitude, decimalLongitude) %>% 
+  count() %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column(var='id_plot') %>%
   rename(rich = n)
 ```
 
