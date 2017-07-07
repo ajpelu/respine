@@ -7,6 +7,7 @@ Author: Antonio J Perez-Luque <ajperez@go.ugr.es>
 Maintainer: Antonio J Perez-Luque <ajperez@go.ugr.es>
 Description: App to show the resilience of mediterranean pine plantations under 
   a global change scenario. 
+Depends: R (>= 2.10)
 Imports:
   raster,
   landscapeR
