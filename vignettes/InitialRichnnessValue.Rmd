@@ -119,17 +119,6 @@ aux <- aux %>% mutate(newECO = recode_factor(COD_ECOSIS,
                                                     `6`="Aquatic systems", 
                                                     `NA`="NA", 
                                                     .default = 'Natural Forests'))
-
-aux <- aux %>% mutate(ECOSISTE_1 = recode_factor(ECOSISTE_1,
-         `Matorral de alta monta\361a (enebrales, sabinales, piornales)` =
-           "Matorral de alta montana (enebrales, sabinales, piornales)",
-         `Matorrales de media monta\361a (retamares, tomillares, etc.)`= 
-           "Matorrales de media montana (retamares, tomillares, etc.)",
-         `Pastos de media monta\361aMaSis` = "Pastos de media montana",
-         `Pinares aut\363ctonos de P. sylvestris` = "Pinares autoctonos de P. sylvestris",
-         `Pinares aut\363ctonos sobre dolom\355as` = "Pinares autoctonos sobre dolomias",
-         `Repoblaciones de con\355feras`= "Repoblaciones de coniferas",
-         `Sistemas acu\341ticos` = "Sistemas acuaticos")) 
 ```
 
 
