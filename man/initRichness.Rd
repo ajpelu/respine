@@ -31,5 +31,5 @@ Esta funcion establece los valores iniciales de riqueza de especies
 \references{
 Gomez-Aparicio L, Zavala MA, Bonet FJ, Zamora R (2009) Are pine plantations
 valid tools for restoring Mediterranean forests? An assessment along abiotic
-and biotic gradients. Ecological Applications, 19: 2124–2141.
+and biotic gradients. Ecological Applications, 19: 2124 - 2141.
 }
