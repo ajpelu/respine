@@ -35,7 +35,7 @@ initRichness <- function(r, r_range, treedensity, pastUse, rescale=TRUE){
   r[r == 2]  <- sample(aux$lowRich:aux$upRich,
                        ncell(r[r==2]), replace = TRUE)
   # Crops
-  aux <- r_range[which(auxdf$value == 3), ]
+  aux <- r_range[which(r_range$value == 3), ]
   r[r == 3]  <- sample(aux$lowRich:aux$upRich,
                        ncell(r[r==3]), replace = TRUE)
 
@@ -51,7 +51,7 @@ initRichness <- function(r, r_range, treedensity, pastUse, rescale=TRUE){
                         ifelse(pastUse == 'Crop', .1, .2)))
   f <- (.3*fplu + .7*ftreeden)
 
-  aux <- r_range[which(auxdf$value == 1), ]
+  aux <- r_range[which(r_range$value == 1), ]
   r[r == 1]  <- sample(aux$lowRich:aux$upRich, ncell(r[r==1]), replace = TRUE) * f
 
   # Rescale results
