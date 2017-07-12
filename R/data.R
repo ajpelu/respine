@@ -80,3 +80,37 @@
 #'
 #' @references \url{https://doi.org/10.3897/phytokeys.35.6363}
 "richSinfo"
+
+#' Relation between Shannon Diversity index and Seed Source distance to oak
+#' vegetation
+#'
+#' A dataset containing the Shannon diversity of pine plantantions and the
+#' distance to nearest Oak formation. This dataset come from by Gonzalez-Moreno (2009),
+#' from the digitalization of Figure 3.2.B. It was used by Gonzalez-Moreno (2009)
+#' and by Gonzalez-Moreno et al. 2011 to assess the effect of distance in the
+#' Shannon diversity observed in pine plantations (proximity to seed source).
+#' A dataset containing the richness of Sierra Nevada ecosystems according to
+#'
+#' The equation obtained fitting a linear model between distance and shannon
+#' diversity will be used to determine the initial richnnes of each pixel in the
+#' pine plantations.
+#'
+#' González-Moreno P (2009) Natural regeneration and biodiversity in pine
+#' plantations of Southern Spain: a landscape approach. Master’s Thesis,
+#' Wageningen University, Netherlands
+#'
+#' Gonzalez-Moreno P, Quero JL, Bonet FJ, Poorter L, Zamora R. (2011) Is spatial
+#' structure the key to promote plant diversity in Mediterranean forest
+#' plantations?. Basic and Applied Ecology 12 (3): 251-259
+#'
+#'
+#' @format A \code{data frame} with 3 columns:
+#' \describe{
+#'  \item{wdhOak}{Weighted distance downhill to seed source. See references.
+#'   Distance is double square root transformed}
+#'  \item{SH}{Shannon diversity index }
+#'  \item{dist}{Distance to oak formation (in meters)}
+#' }
+#'
+#' @references \url{https://doi.org/10.1016/j.baae.2011.02.012}
+"diversity_distance"
