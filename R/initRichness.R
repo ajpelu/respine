@@ -31,13 +31,11 @@ initRichness <- function(r, r_range, treedensity, pastUse, rescale=TRUE){
 
   # Natural forest (2)
   aux <- r_range[which(r_range$value == 2), ]
+  r[r == 2]  <- sample(aux$lowRich:aux$upRich, ncell(r[r==2]), replace = TRUE)
 
-  r[r == 2]  <- sample(aux$lowRich:aux$upRich,
-                       ncell(r[r==2]), replace = TRUE)
   # Crops
   aux <- r_range[which(r_range$value == 3), ]
-  r[r == 3]  <- sample(aux$lowRich:aux$upRich,
-                       ncell(r[r==3]), replace = TRUE)
+  r[r == 3]  <- sample(aux$lowRich:aux$upRich, ncell(r[r==3]), replace = TRUE)
 
   # Pine plantations
   # R ~ potR * (0.3*(pastUSE) + 0.7*(treeDensity))
@@ -45,10 +43,29 @@ initRichness <- function(r, r_range, treedensity, pastUse, rescale=TRUE){
   # Fraction of Potential Richness (tree Density Eq. 3 Gomez Aparicio et al. 2009)
   ftreeden <- exp(-0.5*((treedensity - 0.22)/1504.1)^2)
 
+
+
   # Past Land Use
-  fplu <- ifelse(pastUse == 'Oak', .99,
-                 ifelse(pastUse == 'Shrubland', .4,
-                        ifelse(pastUse == 'Crop', .1, .2)))
+  fplu <- ifelse(pastUse == 'Oak', .9999,
+                 ifelse(pastUse == 'Shrubland', .4982,
+                        ifelse(pastUse == 'Crop', .0279, .0001)))
+
+
+
+
+  # odds encontrar no regeneration
+  ## Oak: 0.3935
+  ## Shrubland: 1.7576
+  TODO: Computar distancia a manchas
+
+  # 0.01 recruits/m2 Croplan
+  # 0.11 Pasture (0.27)
+  # 0.17 Mid-mountain (0.43)
+  # 0.38 Oak (1)
+  rescale(c(0.01, 0.11, 0.17, 0.38), to=c(0.001, 1))
+  0.38 - 0.01 / 0.38 - 0.01
+
+
   f <- (.3*fplu + .7*ftreeden)
 
   aux <- r_range[which(r_range$value == 1), ]
