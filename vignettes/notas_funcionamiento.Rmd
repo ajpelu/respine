@@ -1,0 +1,150 @@
+---
+title: "Notas Funcionamiento"
+author: "Antonio J Perez-Luque"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+bibliography: REFERENCES.bib
+csl: ecology.csl
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Establecer los valores iniciales de la Riqueza
+
+## Plantaciones 
+
+La riqueza inicial es de: 
+
+riqueza ~ 0.1 regenerado + 0.3 distancia semillas + 0.6 densidad 
+
+ 
+### ~ Densidad 
+
+### ~ Regenerado
+
+El regenerado de *Quercus* en las plantaciones se ve afectado por el uso del suelo en el pasado, la densidad de plantación y la distancia a la mancha de bosques naturales. 
+
+En primer lugar hemos de analizar la aportación del regenerado de *Quercus* a la riqueza que encontramos en las plantaciones. 
+
+#### Aportación del regenerado de *Quercus* a la riqueza de las parcelas 
+
+Del total de la riqueza observada en las parcelas de SINFONEVADA, analizamos cuanto se debe a la aportación de especies de *Quercus*: 
+
+```{r}
+library("rgbif")
+
+### uuid of Sinfonevada
+sinfo_uuid <- 'db6cd9d7-7be5-4cd0-8b3c-fb6dd7446472'
+
+### See metadata
+sinfo_meta <- datasets(uuid = sinfo_uuid)
+
+# Get table of ocurrences
+sf <- occ_data(datasetKey=sinfo_meta$data$key, limit = 8000)
+
+
+# Get only the fields of interest  
+df <- sf$data %>% dplyr::select(decimalLatitude, decimalLongitude, scientificName)
+
+# How many species by plot
+richness_loc <- df %>%
+  group_by(decimalLatitude, decimalLongitude) %>% 
+  count() %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column(var='id_plot') %>%
+  rename(rich = n)
+
+# Get number of quercus species by plot 
+q <- df %>%
+  filter(grepl("Quercus", scientificName)) %>% 
+  group_by(decimalLatitude, decimalLongitude) %>% 
+  count() %>% 
+  as.data.frame() %>% 
+  rename(rich_quercus = n)
+
+# Get total richness by plot 
+richness_tot <- df %>%
+  group_by(decimalLatitude, decimalLongitude) %>% 
+  count() %>% 
+  as.data.frame() %>% 
+  rename(rich_total = n)
+
+per_quercus_plot <- richness_tot %>% 
+  inner_join(q, by=c('decimalLatitude', 'decimalLongitude')) %>% 
+  mutate(per = rich_quercus / rich_total)
+```
+
+```{r}
+per_quercus_plot %>% ggplot(aes(per)) + geom_histogram() +
+  xlab('% Quercus species by plot')
+```
+
+```{r}
+per_quercus_plot %>% 
+  summarise(mean = mean(per),
+            min = min(per), 
+            max = max(per), 
+            median = median(per))
+```
+
+Las quercínes aportan (como promedio) a la riqueza de la parcela en torno al 9 % (9.08), por lo tanto, deberíamos ajustar la aportación de el uso del suelo a la riqueza de las parcelas de pinar. :red_circle: Así en la función `initRichness` el peso del uso del suelo en la riqueza está ponderado a un 10 % 
+
+Por otro lado sabemos que el regenerado de *Quercus* en las plantaciones depende del uso del suelo en el pasado, de la distancia a la fuente semillera y de la densidad de la plantación [@Navarro2013; @GomezAparicio2009]. Además sabemos que la regeneración de quercíneas en pinares depende mas del uso del suelo que de la densidad de la plantación y que la distancia a la fuente semillera (ver tabla 2 en @Navarro2013). Por tanto en nuestro modelo, puesto que la distancia a la fuente semillera y la densidad se van a considerar, para la cantidad de regenerado solamente tendremos en cuenta el uso en el pasado. 
+
+### ~ Distancia a la fuente semillera
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Dentro de nuestro modelo vamos a considerar dos módulos de 
+
+la densidad de las plantaciones, 
+
+### ~ uso
+
+El valor de riqueza de una plantacion está condicionado por el uso del suelo en el pasado [@Navarro2013], ya que la probabilidad de encontrar reclutas de especies de *Quercus* dentro de un pinar depende entre otras del uso del suelo en el pasado de esa repoblación. 
+
+[@Navarro2013] diferencian entre la probabilidad de encontrar regeneración en una plantación de pinar y la cantidad de regerenación (número de reclutas) que se
+encuentra dentro de dicha plantación. Asi tenemos: 
+
+* La probabilidad de no encontrar regeneración dentro de una plantación varía en función del uso del suelo pasado. Para cada uno de los usos del suelo del pasado el modelo zero-inflado de [@Navarro2013] estima unos *odds-ratio*. Se han rescalado dichos valores entre 0.0001 y 0.9999. Se ha computado el reverso (1 - x) de la probabilidad reescalada. De tal forma que tenemos: 
+
+| Past Land Use           | odds Ratio | rescaleValue | reverse Rescale Value |
+|-------------------------|------------|--------------|-----------------------|
+| Oak formation           | 0.3935     | 0.0001       | 0.9999                |
+| Mid-mountain Shrubland  | 1.7576     | 0.5018       | 0.4982                |
+| Pasture                 | 3.1119     | 0.9999       | 0.0001                |
+| Cropland                | 3.0362     | 0.9720       | 0.0279                |
+
+donde, la **probabilidad reescalada de encontrar regeneración** en función del uso del suelo sigue el siguiente gradiente: Encinar (0.9999) > Matorrales (0.4982) > Cultivos (0.0279) > Pastizales (0.0001). 
+
+* La cantidad de regenerado también depende del uso en el pasado (ver tabla 3 en [@Navarro2013]). 
+
+
+En nuestro modelo, la cantidad de regenerado no afecta a la riqueza, sino simplemente la presencia y/o ausencia de regenerado, por lo tanto utilizaremos solamente la probabilidad reescalada de encontrar regeneración para incluir el uso del suelo en el pasado. 
+
+
+
+
+
+
+* Nota, todo esto es para una misma distancia y una densidad media de 750 pinos/ha 
+
+
+
+
+
+
+

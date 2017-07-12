@@ -62,8 +62,6 @@ shinyServer(
       levelplot(d, att='landuse', scales=list(draw=FALSE),
                 col.regions = colores, colorkey=FALSE, key = myKey)
 
-
-
     })
   }
 
