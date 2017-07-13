@@ -25,14 +25,17 @@ shinyServer(
   function(input, output){
     # --> Run once each time user visits the app
 
-    # Tree density
+    # Tree density (numeric)
     den_pp <- reactive({
-      den_pp <- input$density_pp # density pine plantations
-      })
+      den_pp <- switch(input$density_pp,
+                       'baja' = mean(c(0,750)),
+                       'media' = mean(c(750,1500)),
+                       'alta' = 2000)
+    })
 
     # Colour Tree density
     colour_tree_density <- reactive({
-      colour_tree_density <- switch(den_pp(),
+      colour_tree_density <- switch(input$density_pp,
                                     'baja' = '#a1d99b',
                                     'media' = '#238b45',
                                     'alta' = '#00441b')
@@ -54,7 +57,7 @@ shinyServer(
       ## set colours
       colores <- c('lightgoldenrod1', # Crops
                    'green', # Natural forests
-                   'gray99', # Other
+                   'white', # Other
                    colour_tree_density()) # Pine plantation
 
       ## Legend
@@ -81,15 +84,36 @@ shinyServer(
 
       myr_range <- as.data.frame(
         cbind(value = c(0,1,2,3),
-              lowRich = c(0, 12.82, mean(13.72, 15.62), 5),
-              upRich = c(0, 13.34, mean(16.11, 19.66), 7)))
+              lowRich = c(0, 12.82, mean(13.72, 15.62), 1),
+              upRich = c(0, 13.34, mean(16.11, 19.66), 3)))
 
       mapa_riqueza <- initRichness(r = rasterIni(),
                                    draster = dist_raster,
                                    r_range = myr_range,
                                    treedensity = den_pp(), # density pine plantations
                                    pastUse = pastUse,
-                                   rescale = TRUE)
+                                   rescale = FALSE)
+
+      ## Legend
+      # myKey <- list(space='bottom')
+      #plot(mapa_riqueza)
+
+      mapa_riqueza[mapa_riqueza == 0] <- NA
+
+      mytheme <- rasterTheme(region = brewer.pal(6, "YlGn"))
+
+      levelplot(mapa_riqueza,
+                par.settings = mytheme, margin = FALSE,
+                scales=list(draw=FALSE),
+                colorkey = list(space = "bottom"),
+                pretty=TRUE)
+
+
+
+
+      # myTheme <- BTCTheme()
+      # myTheme$panel.background$col = 'gray'
+
     })
   }
 
