@@ -18,7 +18,6 @@ library("ggplot2")
 ```
 
 
-
 # Establecer los valores iniciales de la Riqueza
 
 ## Plantaciones 
@@ -29,6 +28,7 @@ riqueza ~ 0.1 regenerado + 0.3 distancia semillas + 0.6 densidad
 
  
 ### ~ Densidad 
+:red_circle: completar documentacion 
 
 ### ~ Regenerado
 
@@ -97,26 +97,39 @@ per_quercus_plot %>%
 
 Las quercínes aportan (como promedio) a la riqueza de la parcela en torno al 9 % (9.08), por lo tanto, deberíamos ajustar la aportación de el uso del suelo a la riqueza de las parcelas de pinar. :red_circle: Así en la función `initRichness` el peso del uso del suelo en la riqueza está ponderado a un 10 % 
 
-Por otro lado sabemos que el regenerado de *Quercus* en las plantaciones depende del uso del suelo en el pasado, de la distancia a la fuente semillera y de la densidad de la plantación [@Navarro2013; @GomezAparicio2009]. Además sabemos que la regeneración de quercíneas en pinares depende mas del uso del suelo que de la densidad de la plantación y que la distancia a la fuente semillera (ver tabla 2 en @Navarro2013). Por tanto en nuestro modelo, puesto que la distancia a la fuente semillera y la densidad se van a considerar, para la cantidad de regenerado solamente tendremos en cuenta el uso en el pasado. 
+El regenerado de *Quercus* en las plantaciones depende del uso del suelo en el pasado, de la distancia a la fuente semillera y de la densidad de la plantación [@Navarro2013; @GomezAparicio2009]. Además sabemos que la regeneración de quercíneas en pinares depende mas del uso del suelo que de la densidad de la plantación y que la distancia a la fuente semillera (ver tabla 2 en @Navarro2013). Por tanto en nuestro modelo, para la cantidad de regenerado solamente tendremos en cuenta el uso en el pasado, ya que la distancia a la fuente semillera y la densidad se van a considerar (para la estimación de la riqueza).  
 
 ### ~ Distancia a la fuente semillera
 
-La dispersión de semillas depende de la distancia a la fuente semillera (Hewitt and Kellman 2002). En los pinares de repoblación ocurre algo similar, de forma que la presencia y abundancia de especies diferentes a los pinos, está determinanda entre otras por la distancia a la fuente semillera [@Gonzalez2011], aunque no es la única razón que explica la diversidad observada en los pinares de repoblación. 
+La dispersión de semillas depende de la distancia a la fuente semillera (:red_circle: Hewitt and Kellman 2002). En los pinares de repoblación ocurre algo similar, de forma que la presencia y abundancia de especies diferentes a los pinos, está determinanda entre otras por la distancia a la fuente semillera [@Gonzalez2011], aunque no es la única razón que explica la diversidad observada en los pinares de repoblación. 
 
-@Gonzalez2011 determinaron que de los diferentes tipos de vegetación considerados, los bosques naturales de quercíneas son los mas influyentes en cuanto a la distancia a la fuente semillera. Así distancias mas cortas podrían incrementar el pool de especies en las plantaciones y reducir la uniformidad de estas. 
+@Gonzalez2011 determinaron que, de los diferentes tipos de vegetación considerados, los bosques naturales de quercíneas son los mas influyentes en cuanto a la distancia a la fuente semillera. Así distancias mas cortas podrían incrementar el pool de especies en las plantaciones y reducir la uniformidad de estas. 
 
 En concreto, la relación encontrada entre la distancia y la diversidad observada en las plantaciones de pinos se rige por la siguiente ecuación: 
 
 ```{r}
+df <- read.csv('diversity_distance.csv', header=TRUE)
+
 # df %>% ggplot(aes(y=SH, x=wdhOak)) + geom_point() + geom_smooth(method = 'lm')
-data("diversity_distance")
 
 # Fit a linear model
-m1 <- lm(SH ~ wdhOak, data=diversity_distance)
+m1 <- lm(SH ~ wdhOak, data=df)
 
 # Get coefficients
 coef(m1)
 ```
+
+
+esto es: 
+$$ Diversity = 1.7605 - 0.0932 * \sqrt{\sqrt{Distance}}$$ 
+
+Para cada pixel de pinar se computan las distancias entre su centroide y los bordes de las formaciones de bosques naturales, mediante la función `dist2nf`. Posteriormente, para los pixeles de pinar se computa el valor de diversidad potencial según la ecuación anterior y se reescalan los valores entre 0 y 1. 
+
+
+
+
+
+
 
 
 
