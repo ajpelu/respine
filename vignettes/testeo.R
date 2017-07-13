@@ -72,6 +72,11 @@ initRichness <- function(r, r_range, treedensity, pastUse, rescale=TRUE)
 
 
 
+
+  # !!! por aqui vas
+
+
+
 dist_raster <- dist2nf(myl, nf_value = 2)
 
 sh <- calc(dist_raster, fun=function(x){1.7605 - 0.0932*(sqrt(sqrt(x)))})
