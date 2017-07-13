@@ -47,7 +47,7 @@ initRichness <- function(r, draster, r_range, treedensity, pastUse, rescale=TRUE
 
   ## ~ TreeDensity
   ### Fraction of Potential Richness (tree Density Eq. 3 Gomez Aparicio et al. 2009)
-  ftreeden <- exp((-1)*0.5*((treedensity - 0.22)/1504.1)^2)
+  ftreeden <- exp(-0.5*((treedensity - 0.22)/1504.1)^2)
 
   ## ~ PastUSE
   ### Past Land Use

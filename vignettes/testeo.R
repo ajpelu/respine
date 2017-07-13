@@ -1,6 +1,7 @@
 library(raster)
 source('./R/createLandscape.R')
 source('./R/initRichness.R')
+source('./R/dist2nf.R')
 library(landscapeR)
 library(rasterVis)
 library(rgeos)
@@ -49,8 +50,7 @@ levelplot(myl, att='landuse', scales=list(draw=FALSE),
 
 ### 4 ### VALORES RIQUEZA INICIALES
 
-borde <- rasterToPolygons(myl, fun=function(x){x==2},
-                             dissolve = TRUE)
+borde <- rasterToPolygons(myl, fun=function(x){x==2}, dissolve = TRUE)
 
 levelplot(myl, att='landuse', scales=list(draw=FALSE),
           col.regions = colores, colorkey=FALSE, key = myKey) +
@@ -63,44 +63,59 @@ myr_range <- as.data.frame(
         upRich = c(0, 13.34, mean(16.11, 19.66), 7)))
 
 
+dist_raster <- dist2nf(myl, nf_value = 2)
+
 mapa_riqueza <- initRichness(r = myl,
+                             draster = dist_raster,
                              r_range = myr_range,
                              treedensity = den_pp,
-                             pastUse = pastUse)
-
-initRichness <- function(r, r_range, treedensity, pastUse, rescale=TRUE)
-
+                             pastUse = pastUse,
+                             rescale = TRUE)
 
 
 
-  # !!! por aqui vas
 
 
 
-dist_raster <- dist2nf(myl, nf_value = 2)
+r <- myl
+treedensity <- den_pp
+
+
+
+
+
+
+## ~ TreeDensity
+### Fraction of Potential Richness (tree Density Eq. 3 Gomez Aparicio et al. 2009)
+treedensity <- den_pp
+ftreeden <- exp(-0.5*((treedensity - 0.22)/1504.1)^2)
+
+## ~ PastUSE
+### Past Land Use
+fplu <- ifelse(pastUse == 'Oak', .9999,
+               ifelse(pastUse == 'Shrubland', .4982,
+                      ifelse(pastUse == 'Crop', .0279, .0001)))
+
+# Get contribution factor of tree Density and Past Land Use
+f2 <- (.6*ftreeden + .1*fplu)
 
 sh <- calc(dist_raster, fun=function(x){1.7605 - 0.0932*(sqrt(sqrt(x)))})
 
+# Create a stack with the shanon diversity raster and landuse raster, and then compute values for pine plantations
+s <- calc(stack(myl, sh), fun=function(x)  ifelse(x[1] == 1 , x[1]*x[2],  NA))
 
-# myl[myl==1] <- 99
-# pine_mask <- calc(myl, fun=function(x){ x[x < 98] <- NA; return(x)})
-# myl[myl==99] <- 1
-# plot(pine_mask)
 
-ifelse
-mystack <- stack(myl, sh)
-
-i <- calc(mystack, fun=function(x)  ifelse(x[1] == 1 , x[1]*x[2],  x[1]))
+sh_scaled <- (s - cellStats(s, "min"))/(cellStats(s, "max") - cellStats(s, "min"))
 
 
 
-
-MyFun <- function(x, y) abs(x) * y
-res <- overlay(x, y, fun = MyFun)
-
-ok <- overlay(x=myl, y=sh, fun = function(x, y) {ifelse(x == 1, x*y, x)})
+r_range <- myr_range
 
 
 
-s <- calc(r, fun=function(x){ x[x < 4] <- NA; return(x)} )
-shm <- mask
+ola <- initRichness(r, r_range, treedensity, pastUse, rescale=TRUE)
+
+
+
+
+

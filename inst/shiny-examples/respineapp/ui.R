@@ -58,7 +58,9 @@ fluidPage(
 
     mainPanel(
       tabsetPanel(type = "tabs",
-                  tabPanel("Mapa Inicial", plotOutput(outputId = 'initial_map'))
+                  tabPanel("Mapa Inicial", plotOutput(outputId = 'initial_map')),
+                  tabPanel("Mapa Riqueza", plotOutput(outputId = 'richness_map'))
+
                   )
               )
     )

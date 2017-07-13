@@ -17,52 +17,79 @@ extent(r) <- matrix(c(0, 0, 200, 100), nrow=2)
 r[] <- 0
 
 source('createLandscape.R', local=TRUE)
+source('initRichness.R', local = TRUE)
+source('dist2nf.R', local = TRUE)
 
 
 shinyServer(
   function(input, output){
     # --> Run once each time user visits the app
 
-
-    output$initial_map <- renderPlot({
-      # --> Run each time a user changes a widget that output$map relies on
-
-      # Landscape parameteres
-      size_pp <- input$size_pp  # size pine plantations
+    # Tree density
+    den_pp <- reactive({
       den_pp <- input$density_pp # density pine plantations
-      size_nf <- input$size_nf # size natural forests
-      n_nf <- input$n_nf  # n patchs natural forests
+      })
 
-      # Colour Tree density
-      colour_tree_density <- switch(input$density_pp,
+    # Colour Tree density
+    colour_tree_density <- reactive({
+      colour_tree_density <- switch(den_pp(),
                                     'baja' = '#a1d99b',
                                     'media' = '#238b45',
                                     'alta' = '#00441b')
+      })
 
+    rasterIni <- reactive({
       d <- createLandscape(r,
-                           size_pp = size_pp,
-                           size_nf = size_nf, n_nf = n_nf)
+                           size_pp = input$size_pp,
+                           size_nf = input$size_nf,
+                           n_nf = input$n_nf)
+      })
 
-      ## $TODO$$ Como hacer esto?? Es necesario
-      ## dvector <- rasterToPolygons(d, fun=function(x){x>0}, dissolve = TRUE)
 
-      #
+    output$initial_map <- renderPlot({
+
+      # ## $TODO$$ Como hacer esto?? Es necesario
+      # ## dvector <- rasterToPolygons(d, fun=function(x){x>0}, dissolve = TRUE)
+
       ## set colours
       colores <- c('lightgoldenrod1', # Crops
                    'green', # Natural forests
                    'gray99', # Other
-                   colour_tree_density) # Pine plantation
+                   colour_tree_density()) # Pine plantation
 
       ## Legend
       myKey <- list(text = list(lab = c("crop", "natural forest","other", "pine")),
                     rectangles=list(col = colores),
                     space='bottom', columns=4)
 
-
       ## plot
-      levelplot(d, att='landuse', scales=list(draw=FALSE),
+      levelplot(rasterIni(), att='landuse', scales=list(draw=FALSE),
                 col.regions = colores, colorkey=FALSE, key = myKey)
 
+    })
+
+    output$richness_map <- renderPlot({
+
+      pastUse <- switch(input$pp_pastUse,
+                        'Bosque natural' = 'Oak',
+                        'Matorral' = 'Shrubland',
+                        'Pastizal' = 'Pasture',
+                        'Cultivo' = 'Crop')
+
+      # Compute distance raster
+      dist_raster <- dist2nf(rasterIni(), nf_value = 2)
+
+      myr_range <- as.data.frame(
+        cbind(value = c(0,1,2,3),
+              lowRich = c(0, 12.82, mean(13.72, 15.62), 5),
+              upRich = c(0, 13.34, mean(16.11, 19.66), 7)))
+
+      mapa_riqueza <- initRichness(r = rasterIni(),
+                                   draster = dist_raster,
+                                   r_range = myr_range,
+                                   treedensity = den_pp(), # density pine plantations
+                                   pastUse = pastUse,
+                                   rescale = TRUE)
     })
   }
 
