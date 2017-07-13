@@ -12,7 +12,9 @@ Imports:
   raster,
   landscapeR,
   rgeos,
-  rgbif
+  rgbif,
+  dplyr, 
+  ggplot2
 License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/ajpelu/respine/ 
