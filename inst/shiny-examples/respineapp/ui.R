@@ -28,37 +28,76 @@ fluidPage(
   # Application title
   titlePanel('Naturalización de Pinares'),
 
-  hr(), # break horizontal line
+  # hr(), # break horizontal line
 
-  # Plot Output
-  plotOutput(outputId = 'initial_map'),
+  sidebarLayout(
+    sidebarPanel(
+      h4('Repoblación'),
+        sliderInput(inputId = "size_pp",
+                    label = "Tamaño de la repoblación de pinar",
+                    min = 300, max = 6000, value = 4500),
+        selectInput(inputId = "density_pp",
+                    label = "Densidad de la plantación",
+                    choices = c('baja', 'media', 'alta'),
+                    selected = 'media'),
+      br(),
+      h4('Bosques naturales'),
+        sliderInput(inputId = "n_nf",
+                    label = "Nº bosques naturales",
+                    min = 1, max= 5, value =2),
+        sliderInput(inputId = "size_nf",
+                    label = "Tamaño",
+                    min = 10, max = 500, value = 350),
+      br(),
+      h4('Usos del pasado'),
+        selectInput(inputId = "pp_pastUse",
+                    label = "Uso del pasado",
+                    choices = c('Bosque natural', 'Matorral', 'Pastizal', 'Cultivo'),
+                    selected = 'Matorral')
+      ),
 
-  hr(),
-
-  fluidRow(
-    column(3,
-           h4('Repoblación'),
-           sliderInput(inputId = "size_pp",
-                       label = "Tamaño de la repoblación de pinar",
-                       min = 300, max = 6000, value = 4500),
-
-           selectInput(inputId = "density_pp",
-                       label = "Densidad de la plantación",
-                       choices = c('baja', 'media', 'alta'),
-                       selected = 'media')
-    ),
-    column(4,
-           h4('Bosques naturales'),
-           sliderInput(inputId = "n_nf",
-                       label = "Nº bosques naturales",
-                       min = 1, max= 5, value =2),
-
-           sliderInput(inputId = "size_nf",
-                       label = "Tamaño",
-                       min = 10, max = 500, value = 350)
-
+    mainPanel(
+      tabsetPanel(type = "tabs",
+                  tabPanel("Mapa Inicial", plotOutput(outputId = 'initial_map'))
+                  )
+              )
     )
-
-
-  )
 )
+
+#   # Plot Output
+#   plotOutput(outputId = 'initial_map'),
+#
+#   hr(),
+#
+#   fluidRow(
+#     column(3,
+#            h4('Repoblación'),
+#            sliderInput(inputId = "size_pp",
+#                        label = "Tamaño de la repoblación de pinar",
+#                        min = 300, max = 6000, value = 4500),
+#
+#            selectInput(inputId = "density_pp",
+#                        label = "Densidad de la plantación",
+#                        choices = c('baja', 'media', 'alta'),
+#                        selected = 'media')
+#     ),
+#     column(4,
+#            h4('Bosques naturales'),
+#            sliderInput(inputId = "n_nf",
+#                        label = "Nº bosques naturales",
+#                        min = 1, max= 5, value =2),
+#
+#            sliderInput(inputId = "size_nf",
+#                        label = "Tamaño",
+#                        min = 10, max = 500, value = 350)
+#
+#     ),
+#     column(5,
+#            h4('Usos del pasado'),
+#            selectInput(inputId = "pp_pastUse",
+#                        label = "Uso del pasado",
+#                        choices = c('Bosque natural', 'Matorral', 'Pastizal', 'Cultivo'),
+#                        selected = 'Matorral')
+#            )
+#   )
+# )

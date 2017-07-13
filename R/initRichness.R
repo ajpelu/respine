@@ -33,11 +33,11 @@ initRichness <- function(r, r_range, treedensity, pastUse, rescale=TRUE){
   aux <- r_range[which(r_range$value == 2), ]
   r[r == 2]  <- sample(aux$lowRich:aux$upRich, ncell(r[r==2]), replace = TRUE)
 
-  # Crops
+  # Crops (3)
   aux <- r_range[which(r_range$value == 3), ]
   r[r == 3]  <- sample(aux$lowRich:aux$upRich, ncell(r[r==3]), replace = TRUE)
 
-  # Pine plantations
+  # Pine plantations (1)
   # R ~ potR * (0.1*(pastUSE) + 0.7*(treeDensity))
 
   # Fraction of Potential Richness (tree Density Eq. 3 Gomez Aparicio et al. 2009)
