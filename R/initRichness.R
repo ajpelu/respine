@@ -52,11 +52,20 @@ initRichness <- function(r, r_range, treedensity, pastUse, rescale=TRUE){
                  ifelse(pastUse == 'Shrubland', .4982,
                         ifelse(pastUse == 'Crop', .0279, .0001)))
 
+  # Distance to Seed Source
+  ## Compute distance raster
+  dist_raster <- dist2nf(r, nf_value = 2)
+  ## Compute diversity raster
+  sh <- calc(dist_raster, fun=function(x){1.7605 - 0.0932*(sqrt(sqrt(x)))})
+
+
 
 
 ## ojo meter la distancia fdis
-## ojo esta proporcion debe estar basada en n quercus por plantaciones
-  f <- (.1*fplu + .7*ftreeden)
+## ojo como asignamos los pesos??
+  f <- (.1*fplu + .3*fdis + .6*ftreeden)
+
+
 
   aux <- r_range[which(r_range$value == 1), ]
   r[r == 1]  <- sample(aux$lowRich:aux$upRich, ncell(r[r==1]), replace = TRUE) * f

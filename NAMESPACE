@@ -2,3 +2,4 @@
 
 import(landscapeR)
 import(raster)
+import(rgeos)

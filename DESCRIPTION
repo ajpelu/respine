@@ -10,7 +10,8 @@ Description: App to show the resilience of mediterranean pine plantations under
 Depends: R (>= 2.10)
 Imports:
   raster,
-  landscapeR
+  landscapeR,
+  rgeos
 License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/ajpelu/respine/ 
