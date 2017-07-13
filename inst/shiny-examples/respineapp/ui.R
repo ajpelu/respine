@@ -31,7 +31,7 @@ fluidPage(
   hr(), # break horizontal line
 
   # Plot Output
-  plotOutput(outputId = 'mapa'),
+  plotOutput(outputId = 'initial_map'),
 
   hr(),
 

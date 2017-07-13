@@ -24,7 +24,7 @@ shinyServer(
     # --> Run once each time user visits the app
 
 
-    output$mapa <- renderPlot({
+    output$initial_map <- renderPlot({
       # --> Run each time a user changes a widget that output$map relies on
 
       # Landscape parameteres
@@ -43,7 +43,8 @@ shinyServer(
                            size_pp = size_pp,
                            size_nf = size_nf, n_nf = n_nf)
 
-      dvector <- rasterToPolygons(d, fun=function(x){x>0}, dissolve = TRUE)
+      ## $TODO$$ Como hacer esto?? Es necesario
+      ## dvector <- rasterToPolygons(d, fun=function(x){x>0}, dissolve = TRUE)
 
       #
       ## set colours
