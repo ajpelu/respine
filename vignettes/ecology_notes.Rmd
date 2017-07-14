@@ -1,0 +1,84 @@
+---
+title: "Ecology notes for the Respine App"
+author: "Antonio J. Perez-Luque"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+bibliography: REFERENCES.bib
+csl: ecology.csl
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Diversidad y Riqueza de especies
+
+Las plantaciones de pinares presentan menor riqueza de especies y menor diversidad de especies que los bosques naturales de encinar y robledal. Esto se debe, en ambas variables, al menor múmero de especies herbáceas presentes en las plantaciones de pinar [@GomezAparicio2009]. 
+
+| ecosystem                  | potRich | H' index |
+|----------------------------|---------|----------|
+| Pine plantations           | 13.09   | 1.47     |
+| Natural forests Q. ilex    | 14.92   | 1.77     |
+| Natural deciduous forests  | 17.55   | 1.81     |
+
+* La riqueza y diversidad de especies están fuertemente condicionadas por el factor climático (altitud y/o radiación anual) y por la densidad de la plantación. La densidad de plantación tuvo un efecto negativo en la riqueza. 
+
+* La menor diversidad observada en pinares, probablemente se debe a la alta densidad de los pinares en comparación con los bosques naturales, lo que implica unos niveles de luz menor bajo el dosel arbóreo, y esto implica menor diversidad de especies de herbáceas. 
+
+* De forma genérica, la riqueza y abundancia de aves está negativamente afectada por las altas densidades de plantación, especialmente para los arrendajos, reduciendo el flujo de semillas que entran en la plantación. 
+
+* Asimismo, una plantación con densidad muy alta, es probablemente un obstáculo a la dispersión de semillas por viento. 
+
+
+```{r}
+xd0 <- 0.22
+xdb <- 1504.1 
+
+d <- seq(0,3000, by=1)
+
+desp <- exp(-0.5*((d - 0.22)/1504.1)^2)
+
+df <- c()
+fit <- exp(-0.5*((d - 0.22)/1504.1)^2)
+df <- as.data.frame(cbind(d, fit))
+
+plot(df$fit~df$d)
+```
+
+
+
+### Tabla combinaciones efecto densidad y pastLanduse
+```{r}
+# (.6*ftreeden + .1*fplu)
+
+
+m <- matrix(1, nrow=4, ncol=3)
+
+# density 
+treedensity <- c(100, 1250, 3000)
+ftreeden <- exp(-0.5*((treedensity - 0.22)/1504.1)^2)
+mftreeden <- matrix(ftreeden, nrow=4, ncol=3, byrow = TRUE)
+
+# past land use
+fplu <- c(.9999, .4982, .0001, .0279)
+mfplu <- m * fplu
+
+# Combo 
+
+mcombo <- 0.2*mfplu + 0.45*mftreeden
+
+row.names(mcombo) <- c('Oak', 'Shrubland', 'Pasture', 'Crop')
+colnames(mcombo) <- c('baja', 'media', 'alta')
+
+mcombo
+
+```
+
+
+
+
+
+
+
+
+ 

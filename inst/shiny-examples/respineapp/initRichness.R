@@ -67,7 +67,7 @@ initRichness <- function(r, draster, r_range, treedensity, pastUse, rescale=TRUE
   sh_scaled <- (s - cellStats(s, "min"))/(cellStats(s, "max") - cellStats(s, "min"))
 
   ## Combine factor to correct pine plantations (OJO!!!!!!!!!!!!!! PESOS )
-  f_pine <- (sh_scaled*0.3) + (.6*ftreeden + .1*fplu)
+  f_pine <- (sh_scaled*0.35) + (.45*ftreeden + .2*fplu)
 
   aux <- r_range[which(r_range$value == 1), ]
   r[r == 1]  <- sample(aux$lowRich:aux$upRich, ncell(r[r==1]), replace = TRUE)

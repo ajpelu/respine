@@ -28,9 +28,9 @@ shinyServer(
     # Tree density (numeric)
     den_pp <- reactive({
       den_pp <- switch(input$density_pp,
-                       'baja' = mean(c(0,750)),
-                       'media' = mean(c(750,1500)),
-                       'alta' = 2000)
+                       'baja' = 100,
+                       'media' = 1250,
+                       'alta' = 3000)
     })
 
     # Colour Tree density
