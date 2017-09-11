@@ -1,4 +1,6 @@
 library('shiny')
+library('knitr')
+library('markdown')
 library('raster')
 library('landscapeR')
 library('rasterVis')
@@ -23,83 +25,59 @@ size_landscape <- ncell(r)
 # size_pp_min <- ceiling(size_landscape*0.015)
 
 
-fluidPage(
+navbarPage("Respine App", id = "navbar",
+           tabPanel(
+             title = "Configurar Paisaje",
+             value = 'panel1',
+             # Side bar
+             sidebarLayout(
+               sidebarPanel(
+                 # pp
+                 h4("Pinar de Repoblación"),
+                 sliderInput(inputId = "size_pp",
+                             label = "Tamaño de la repoblación de pinar",
+                             min = 300, max = 6000, value = 4500),
+                 selectInput(inputId = "density_pp",
+                             label = "Densidad de la plantación",
+                             choices = c('baja', 'media', 'alta'),
+                             selected = 'media'),
+                 br(),
 
-  # Application title
-  titlePanel('Naturalización de Pinares'),
+                 # nf
+                 h4("Bosques naturales"),
+                 sliderInput(inputId = "n_nf",
+                             label = "Nº bosques naturales",
+                             min = 1, max= 5, value =2),
+                 sliderInput(inputId = "size_nf",
+                             label = "Tamaño",
+                             min = 10, max = 500, value = 350),
+                 br(),
 
-  # hr(), # break horizontal line
+                 # pastUse
+                 h4('Usos del pasado'),
+                 selectInput(inputId = "pp_pastUse",
+                             label = "Uso del pasado",
+                             choices = c('Bosque natural', 'Matorral', 'Pastizal', 'Cultivo'),
+                             selected = 'Matorral')
 
-  sidebarLayout(
-    sidebarPanel(
-      h4('Repoblación'),
-        sliderInput(inputId = "size_pp",
-                    label = "Tamaño de la repoblación de pinar",
-                    min = 300, max = 6000, value = 4500),
-        selectInput(inputId = "density_pp",
-                    label = "Densidad de la plantación",
-                    choices = c('baja', 'media', 'alta'),
-                    selected = 'media'),
-      br(),
-      h4('Bosques naturales'),
-        sliderInput(inputId = "n_nf",
-                    label = "Nº bosques naturales",
-                    min = 1, max= 5, value =2),
-        sliderInput(inputId = "size_nf",
-                    label = "Tamaño",
-                    min = 10, max = 500, value = 350),
-      br(),
-      h4('Usos del pasado'),
-        selectInput(inputId = "pp_pastUse",
-                    label = "Uso del pasado",
-                    choices = c('Bosque natural', 'Matorral', 'Pastizal', 'Cultivo'),
-                    selected = 'Matorral')
-      ),
+                 ),
+               mainPanel(
+                 tabsetPanel(
+                   tabPanel("Pinares de Repoblación", includeMarkdown('chose_pp.md')),
+                   tabPanel("Bosques Naturales", includeMarkdown('chose_nf.md')),
+                   tabPanel("Uso del Suelo Pasado", includeMarkdown('chose_pastUse.md'))
+                   )
+                 )
+               )),
 
-    mainPanel(
-      tabsetPanel(type = "tabs",
-                  tabPanel("Mapa Inicial", plotOutput(outputId = 'initial_map')),
-                  tabPanel("Mapa Riqueza", plotOutput(outputId = 'richness_map'))
+  ### tab 2
+  tabPanel("Paisaje Inicial", value = 'panel2',
+           plotOutput(outputId = 'initial_map')
+           ),
 
-                  )
-              )
-    )
-)
+  ### tab 3
+  tabPanel("Mapa de Riqueza Inicial", value = 'panel3',
+           plotOutput(outputId = 'richness_map')
+           )
 
-#   # Plot Output
-#   plotOutput(outputId = 'initial_map'),
-#
-#   hr(),
-#
-#   fluidRow(
-#     column(3,
-#            h4('Repoblación'),
-#            sliderInput(inputId = "size_pp",
-#                        label = "Tamaño de la repoblación de pinar",
-#                        min = 300, max = 6000, value = 4500),
-#
-#            selectInput(inputId = "density_pp",
-#                        label = "Densidad de la plantación",
-#                        choices = c('baja', 'media', 'alta'),
-#                        selected = 'media')
-#     ),
-#     column(4,
-#            h4('Bosques naturales'),
-#            sliderInput(inputId = "n_nf",
-#                        label = "Nº bosques naturales",
-#                        min = 1, max= 5, value =2),
-#
-#            sliderInput(inputId = "size_nf",
-#                        label = "Tamaño",
-#                        min = 10, max = 500, value = 350)
-#
-#     ),
-#     column(5,
-#            h4('Usos del pasado'),
-#            selectInput(inputId = "pp_pastUse",
-#                        label = "Uso del pasado",
-#                        choices = c('Bosque natural', 'Matorral', 'Pastizal', 'Cultivo'),
-#                        selected = 'Matorral')
-#            )
-#   )
-# )
+  )
