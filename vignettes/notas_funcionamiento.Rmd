@@ -22,21 +22,51 @@ library("ggplot2")
 
 ## Plantaciones 
 
-La riqueza inicial es de: 
+La riqueza inicial se computará en función de: 
 
-riqueza ~ 0.1 regenerado + 0.3 distancia semillas + 0.6 densidad 
+$$ Riqueza \sim RiquezaPotencial \times fc $$ 
+siendo RiquezaPotencial un valor obtenido aleatoriamente entre 12.82 - 13.34 (valores potenciales de riqueza, ver [@GomezAparicio2009; @PerezLuque2014]); y ***fc** un factor de correción que tiene en cuenta
 
- 
-### ~ Densidad 
-:red_circle: completar documentacion 
+$$ fc = w_1 \cdot Reg + w_2 \cdot DistanciaFuenteSemillera + w_3 \cdot TreeDensity $$ 
+
+Los pesos que he asignado dentro de la función `initRichness` son: :red_circle: 
+
+$$ fc = 0.1 \cdot Reg + 0.35 \cdot DistanciaFuenteSemillera + 0.45 \cdot TreeDensity $$ 
+
+### ~ Densidad (Tree density)
+
+La riqueza y diversidad de especies están fuertemente condicionadas por el factor climático (altitud y/o radiación anual) y por la densidad de la plantación [@GomezAparicio2009].  
+
+La densidad tiene un efecto negativo en la diversidad y en la riqueza total de especies que encontramos bajo pinares de repoblación, decreciendo éstas al aumentar la densidad de la plantación [@GomezAparicio2009]. La menor diversidad observada en pinares, probablemente se debe a la alta densidad de los pinares en comparación con los bosques naturales, lo que implica unos niveles de luz menor bajo el dosel arbóreo, y esto implica menor diversidad de especies de herbáceas. 
+
+Además, de forma general, la abundancia y riqueza de aves dispersantes se ve afectada negativamente con altas densidades de árboles (sobre todo para el arrendajo), reduciendo el flujo de semillas que entran en las plantaciones, y por tanto la potencial diversidad dentro de estas.  
+
+La riqueza potencial se ve afectada por la densidad de pinar. Así, según la Eq. 3 de [@GomezAparicio2009], la riqueza potencial se ve afectada en función de la densidad, del siguiente modo: 
+
+
+$$ ftreeden = \exp \left [ -\frac{1}{2} \left( \frac{ treeDensity - 0.22} {1504.1} \right )^2\right ] $$
 
 ### ~ Regenerado
 
-El regenerado de *Quercus* en las plantaciones se ve afectado por el uso del suelo en el pasado, la densidad de plantación y la distancia a la mancha de bosques naturales. 
+#### Variables 
+El regenerado de *Quercus* en las plantaciones depende del uso del suelo en el pasado, de la distancia a la fuente semillera y de la densidad de la plantación [@Navarro2013; @GomezAparicio2009]. Sabemos que la regeneración de quercíneas en pinares depende mas del uso del suelo que de la densidad de la plantación y que la distancia a la fuente semillera (ver tabla 2 en @Navarro2013). 
 
-En primer lugar hemos de analizar la aportación del regenerado de *Quercus* a la riqueza que encontramos en las plantaciones. 
+Para cuantificar la importancia de cada una de las variables, vamos a atender a los valores de varianza explicada por cada uno de los modelos para cada variable. Posteriormente reescalamos la importancia de cada variable y obtenemos: 
 
-#### Aportación del regenerado de *Quercus* a la riqueza de las parcelas 
+| variable (Navarro-Gónzalez et al. 2013) | Pseudo-R2 | importancia - reescalada |
+|-----------------------------------------|-----------|--------------------------|
+| past Land Use                           | 0.1238    | 0.4767                   |
+| Propagule source distance               | 0.0832    | 0.3204                   |
+| Pine density                            | 0.0057    | 0.2029                   |
+
+Por tanto, podemos hablar que el regenerado de quercíneas bajo pinares de repoblación se rige por 
+
+$$ reg \sim 0.4767 \cdot landUse + 0.3204 \cdot Distance + 0.2029 \cdot Density  $$
+
+Otra opción es solamente tener en cuenta el uso en el pasado, ya que la distancia a la fuente semillera y la densidad se van a considerar (para la estimación de la riqueza). (Ver [issue #12](https://github.com/ajpelu/respine/issues/12)). Optamos por esta última opción. 
+
+#### Aportación de las quercíneas a la riqueza total
+Por otro lado hemos de analizar la aportación del regenerado de *Quercus* a la riqueza que encontramos en las plantaciones. Para ello utilizamos SINFONEVADA [@PerezLuque2014]. 
 
 Del total de la riqueza observada en las parcelas de SINFONEVADA, analizamos cuanto se debe a la aportación de especies de *Quercus*: 
 
@@ -95,28 +125,74 @@ per_quercus_plot %>%
             median = median(per))
 ```
 
-Las quercínes aportan (como promedio) a la riqueza de la parcela en torno al 9 % (9.08), por lo tanto, deberíamos ajustar la aportación de el uso del suelo a la riqueza de las parcelas de pinar. :red_circle: Así en la función `initRichness` el peso del uso del suelo en la riqueza está ponderado a un 10 % 
+Las quercínes aportan (como promedio) a la riqueza de la parcela en torno al 9 % (9.08), por lo tanto, deberíamos ajustar la aportación de el uso del suelo a la riqueza de las parcelas de pinar. Así en la función `initRichness` el peso del uso del suelo en la riqueza está ponderado a un 10 % 
 
-El regenerado de *Quercus* en las plantaciones depende del uso del suelo en el pasado, de la distancia a la fuente semillera y de la densidad de la plantación [@Navarro2013; @GomezAparicio2009]. Además sabemos que la regeneración de quercíneas en pinares depende mas del uso del suelo que de la densidad de la plantación y que la distancia a la fuente semillera (ver tabla 2 en @Navarro2013). Por tanto en nuestro modelo, para la cantidad de regenerado solamente tendremos en cuenta el uso en el pasado, ya que la distancia a la fuente semillera y la densidad se van a considerar (para la estimación de la riqueza).  
+#### Uso del suelo 
+
+El valor de riqueza de una plantacion está condicionado por el uso del suelo en el pasado [@Navarro2013], ya que la probabilidad de encontrar reclutas de especies de *Quercus* dentro de un pinar depende entre otras del uso del suelo en el pasado de esa repoblación. 
+
+[@Navarro2013] diferencian entre la probabilidad de encontrar regeneración en una plantación de pinar y la cantidad de regerenación (número de reclutas) que se encuentra dentro de dicha plantación. En nuestro caso, nos interesa mas la probabilidad de encontrar regeneración, mas que la abundancia. De tal forma tenemos que: 
+
+* La probabilidad de no encontrar regeneración dentro de una plantación varía en función del uso del suelo pasado. Para cada uno de los usos del suelo del pasado el modelo zero-inflado de [@Navarro2013] estima unos *odds-ratio*. Se han rescalado dichos valores entre 0.0001 y 0.9999. Se ha computado el reverso (1 - x) de la probabilidad reescalada (para convertirlo en probabilidad de encontrar regenerado). De tal forma que tenemos: 
+
+| Past Land Use           | odds Ratio | rescaleValue | reverse Rescale Value |
+|-------------------------|------------|--------------|-----------------------|
+| Oak formation           | 0.3935     | 0.0001       | 0.9999                |
+| Mid-mountain Shrubland  | 1.7576     | 0.5018       | 0.4982                |
+| Pasture                 | 3.1119     | 0.9999       | 0.0001                |
+| Cropland                | 3.0362     | 0.9720       | 0.0279                |
+
+donde, la **probabilidad reescalada de encontrar regeneración** en función del uso del suelo sigue el siguiente gradiente: Encinar (0.9999) > Matorrales (0.4982) > Cultivos (0.0279) > Pastizales (0.0001). 
+
+* La cantidad de regenerado también depende del uso en el pasado (ver tabla 3 en [@Navarro2013]). 
+
+En nuestro modelo, la cantidad de regenerado no afecta a la riqueza, sino simplemente la presencia y/o ausencia de regenerado, por lo tanto utilizaremos solamente la probabilidad reescalada de encontrar regeneración para incluir el uso del suelo en el pasado. 
+
+Ojo, todos estos valores son para una misma distancia y una densidad media de 750 pinos / ha. 
+
+
+
+
+
+
+
+
+
+
+
 
 ### ~ Distancia a la fuente semillera
 
-La dispersión de semillas depende de la distancia a la fuente semillera (:red_circle: Hewitt and Kellman 2002). En los pinares de repoblación ocurre algo similar, de forma que la presencia y abundancia de especies diferentes a los pinos, está determinanda entre otras por la distancia a la fuente semillera [@Gonzalez2011], aunque no es la única razón que explica la diversidad observada en los pinares de repoblación. 
+La dispersión de semillas depende de la distancia a la fuente semillera [@Hewitt2002]. En los pinares de repoblación la presencia y abundancia de especies diferentes a los pinos, está determinanda entre otras por la distancia a la fuente semillera [@Gonzalez2011], aunque no es la única razón que explica la diversidad observada en los pinares de repoblación. 
 
 @Gonzalez2011 determinaron que, de los diferentes tipos de vegetación considerados, los bosques naturales de quercíneas son los mas influyentes en cuanto a la distancia a la fuente semillera. Así distancias mas cortas podrían incrementar el pool de especies en las plantaciones y reducir la uniformidad de estas. 
 
 En concreto, la relación encontrada entre la distancia y la diversidad observada en las plantaciones de pinos se rige por la siguiente ecuación: 
 
 ```{r}
+## Comment: 
+# La ecuación no está en el paper 
+# Le pregunté a Pablo si tenía la ecuación a mano (Respuesta = disco duro roto) 
+# Tenemos copia de su TFM:
+# - Digitalizar plot A pág 27 
+# - Usar app para obtener los datos
+# - Obtener coef regression
+
 df <- read.csv('diversity_distance.csv', header=TRUE)
 
 # df %>% ggplot(aes(y=SH, x=wdhOak)) + geom_point() + geom_smooth(method = 'lm')
 
 # Fit a linear model
+## using raw values of plot (double square root transformed: wdhOak)
 m1 <- lm(SH ~ wdhOak, data=df)
+
+## using data reverse transformed
+m2 <- lm(SH ~ dist, data=df)
 
 # Get coefficients
 coef(m1)
+coef(m2)
+
 ```
 
 
@@ -139,33 +215,6 @@ la densidad de las plantaciones,
 
 ### ~ uso
 
-El valor de riqueza de una plantacion está condicionado por el uso del suelo en el pasado [@Navarro2013], ya que la probabilidad de encontrar reclutas de especies de *Quercus* dentro de un pinar depende entre otras del uso del suelo en el pasado de esa repoblación. 
-
-[@Navarro2013] diferencian entre la probabilidad de encontrar regeneración en una plantación de pinar y la cantidad de regerenación (número de reclutas) que se
-encuentra dentro de dicha plantación. Asi tenemos: 
-
-* La probabilidad de no encontrar regeneración dentro de una plantación varía en función del uso del suelo pasado. Para cada uno de los usos del suelo del pasado el modelo zero-inflado de [@Navarro2013] estima unos *odds-ratio*. Se han rescalado dichos valores entre 0.0001 y 0.9999. Se ha computado el reverso (1 - x) de la probabilidad reescalada. De tal forma que tenemos: 
-
-| Past Land Use           | odds Ratio | rescaleValue | reverse Rescale Value |
-|-------------------------|------------|--------------|-----------------------|
-| Oak formation           | 0.3935     | 0.0001       | 0.9999                |
-| Mid-mountain Shrubland  | 1.7576     | 0.5018       | 0.4982                |
-| Pasture                 | 3.1119     | 0.9999       | 0.0001                |
-| Cropland                | 3.0362     | 0.9720       | 0.0279                |
-
-donde, la **probabilidad reescalada de encontrar regeneración** en función del uso del suelo sigue el siguiente gradiente: Encinar (0.9999) > Matorrales (0.4982) > Cultivos (0.0279) > Pastizales (0.0001). 
-
-* La cantidad de regenerado también depende del uso en el pasado (ver tabla 3 en [@Navarro2013]). 
-
-
-En nuestro modelo, la cantidad de regenerado no afecta a la riqueza, sino simplemente la presencia y/o ausencia de regenerado, por lo tanto utilizaremos solamente la probabilidad reescalada de encontrar regeneración para incluir el uso del suelo en el pasado. 
-
-
-
-
-
-
-* Nota, todo esto es para una misma distancia y una densidad media de 750 pinos/ha 
 
 
 
