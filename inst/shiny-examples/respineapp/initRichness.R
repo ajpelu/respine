@@ -49,12 +49,6 @@ initRichness <- function(r, draster, r_range, treedensity, pastUse, rescale=TRUE
   ### Fraction of Potential Richness (tree Density Eq. 3 Gomez Aparicio et al. 2009)
   ftreeden <- exp(-0.5*((treedensity - 0.22)/1504.1)^2)
 
-  ## ~ PastUSE
-  ### Past Land Use
-  fplu <- ifelse(pastUse == 'Oak', .9999,
-                 ifelse(pastUse == 'Shrubland', .4982,
-                        ifelse(pastUse == 'Crop', .0279, .0001)))
-
   ## ~ Distance to Seed Source
 
   ## Compute diversity raster (See Gonzalez-Moreno et al. 2011)
@@ -66,7 +60,15 @@ initRichness <- function(r, draster, r_range, treedensity, pastUse, rescale=TRUE
   # Scale the distance effect from 0 to 1
   sh_scaled <- (s - cellStats(s, "min"))/(cellStats(s, "max") - cellStats(s, "min"))
 
-  ## Combine factor to correct pine plantations (OJO!!!!!!!!!!!!!! PESOS )
+  ## ~ PastUSE
+  ### Past Land Use
+  fplu <- ifelse(pastUse == 'Oak', .9999,
+               ifelse(pastUse == 'Shrubland', .4982,
+                      ifelse(pastUse == 'Crop', .0279, .0001)))
+
+  ###### ---------------------------------------
+
+  ## Combine factor to correct pine plantations (OJO!!!!!!!!!!!!!! PESOS)
   f_pine <- (sh_scaled*0.35) + (.45*ftreeden + .2*fplu)
 
   aux <- r_range[which(r_range$value == 1), ]
