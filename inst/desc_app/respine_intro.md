@@ -130,7 +130,6 @@ $$ reg \sim 0.2029 \cdot Den. + 0.3204 \cdot Dist. + 0.4767 \cdot landUse$$
 modelo zero-inflated $\sim$ **prob. no regeneración** + prob. abundancia
 
 
-
 | Past Land Use           | odds       | rescaleValue | reverse |
 |-------------------------|------------|--------------|---------|
 | Oak formation           | 0.3935     | 0.0001       | 0.9999  |
@@ -138,7 +137,7 @@ modelo zero-inflated $\sim$ **prob. no regeneración** + prob. abundancia
 | Pasture                 | 3.1119     | 0.9999       | 0.0001  |
 | Cropland                | 3.0362     | 0.9720       | 0.0279  |
 
-
+* Nota: Valores para misma distancia y densidad media (750 tree/ha) 
 
 
 --- 
