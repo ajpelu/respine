@@ -74,7 +74,7 @@ mapa_riqueza <- initRichness(r = myl,
 
 
 
-
+plot(mapa_riqueza)
 
 
 r <- myl
@@ -114,6 +114,135 @@ r_range <- myr_range
 
 
 ola <- initRichness(r, r_range, treedensity, pastUse, rescale=TRUE)
+
+
+
+
+
+library(ks)
+library(KernSmooth)
+library(raster)
+
+
+set.seed(0)
+GPS <- data.frame(lon=runif(100), lat=runif(100)*2)
+
+est <- bkde2D(GPS, bandwidth=0.1, gridsize = c(400L, 400L))
+names(est) <- c('x', 'y', 'z')
+est.raster <- raster(est)
+plot(est.raster)
+??
+
+
+https://stackoverflow.com/questions/35752736/creating-a-raster-file-from-a-kernel-smooth-with-differing-x-y-resolutions
+https://cran.r-project.org/web/packages/splancs/splancs.pdf
+
+
+# ver libro virgilio Applied Spatial Data Analysis with R kernel2d
+
+
+
+
+library(dplyr)
+library(ggplot2)
+library(fitdistrplus)
+
+
+
+# --------------------
+# Arrendajo from Gomez 2003
+dis <- c(10, 30, 50, 70, 90, 150, 250, 350, 450, 550, 700, 900)
+per <- c(1.07, 1.40, 2.34, 3.78, 9.82, 33.01, 16.11, 11.40, 10.06, 10.33, 4.89, 0.77)
+df <- data.frame(cbind(dis, per))
+
+df <- df %>%
+  mutate(k = -0.1 + 0.02*log(dis) + 0.04*(log(dis^2)),
+         u = 1/k)
+
+df %>% ggplot(aes(x=dis, y=u)) + geom_point() + geom_smooth()
+
+# Fit a lognormal and weibull
+arre_lnorm <- fitdist(df$per, "lnorm")
+arre_w <-  fitdist(df$per, "weibull")
+# --------------------
+
+
+
+grid <- seq(0,1500,1)
+# Arrendajo (Pons & Pausas 2007)
+plot(dlnorm(grid,meanlog = 3.844, sdlog = 0.851), col='blue',
+     type="l")
+
+# kernel para mamíferos González-Varo et al. 2012 http://onlinelibrary.wiley.com/doi/10.1111/1365-2656.12024/full
+lines(grid,
+      ifelse(grid <= 400,
+             dweibull(grid, shape = 1.385, scale = 137),
+             dlnorm(grid, meanlog = 6.621, sdlog = 0.297)),
+      type="l",xlab="x",ylab="f(x)", col='red')
+
+
+lines(grid,
+      dlnorm(grid, meanlog = log(200),
+             sdlog= arre_lnorm$estimate["sdlog"]), col='blue',
+      lty=2)
+
+lines(grid,
+      dweibull(grid,
+               shape = arre_w$estimate["shape"],
+               scale = 88),
+      col='blue', lty=6)
+
+
+lines(grid,
+      dlnorm(grid,meanlog = arre_lnorm$estimate["meanlog"],
+             sdlog= arre_lnorm$estimate["sdlog"]), col='blue',
+      lty=2)
+
+
+
+
+
+dis <- data.frame(d = seq(1,1000, b=1))
+
+dis <- dis %>%
+  mutate(k = -0.1 + 0.02*d + 0.04*(d^2),
+         u = 1/k,
+         u2 = 1/(-0.1 - 0.02*(log(d)) + 0.04*((log(d))^2)),
+         gu = 1/(0.14 - 2.17*(log(d)) - 2.50*((log(d))^2) + 0.7*((log(d))^3)))
+
+dis %>% filter(u > 0) %>%
+  ggplot(aes(x=d, y=gu)) + geom_line()
+
+
+
+
+#### Proposal
+
+data <- data.frame(
+  dis = seq(0,1500,1))
+
+data <- data %>%
+  mutate(
+    sb = dlnorm(dis, meanlog = log(51), sdlog = .9),
+    mb = dlnorm(dis, meanlog = log(151), sdlog = 1),
+    ma = ifelse(dis <= 400,
+                dweibull(dis, shape = 1.385, scale = 137),
+                dlnorm(dis, meanlog = 6.621, sdlog = 0.297)),
+    gg = dlnorm(dis, meanlog = log(450), sdlog = 1))
+
+
+data %>% ggplot(aes(x=dis)) +
+  geom_line(aes(x=dis, y=sb), color='blue') +
+  geom_line(aes(x=dis, y=mb), color='black') +
+  geom_line(aes(x=dis, y=ma), color='red') +
+  geom_line(aes(x=dis, y=gg), color='green') +
+  scale_x_continuous(breaks = seq(0,1500, 100)) +
+  theme_bw() +
+  theme(panel.grid = element_blank()) +
+  ylab('f(x)') +
+  annotate("text",
+           x= 1000, y = 0.010,
+           label=("blue = sb, red = ma, black=mb, green = gg"))
 
 
 

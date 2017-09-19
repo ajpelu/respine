@@ -49,6 +49,18 @@ shinyServer(
       })
 
 
+    output$medium_bird <- renderUI({
+      sliderInput(inputId = "medium_bird",
+                  label = "Aves mediano tamaño",
+                  min = 0, max = 100 - input$small_bird, value = 0)
+      })
+
+    output$restable <- renderTable({
+      myvals<- c(input$small_bird, input$medium_bird, 100-input$small_bird-input$medium_bird)
+      data.frame(Names=c("Aves pequeño tamaño", "Aves mediano tamaño", "Mamíferos"),
+                 Values=myvals)
+    })
+
     output$initial_map <- renderPlot({
 
       # ## $TODO$$ Como hacer esto?? Es necesario

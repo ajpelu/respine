@@ -9,7 +9,7 @@ vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
----
+
 
 ```{r}
 library("rgbif")
@@ -25,7 +25,7 @@ library("ggplot2")
 La riqueza inicial se computará en función de: 
 
 $$ Riqueza \sim RiquezaPotencial \times fc $$ 
-siendo RiquezaPotencial un valor obtenido aleatoriamente entre 12.82 - 13.34 (valores potenciales de riqueza, ver [@GomezAparicio2009; @PerezLuque2014]); y ***fc** un factor de correción que tiene en cuenta
+siendo RiquezaPotencial un valor obtenido aleatoriamente entre 12.82 - 13.34 (valores potenciales de riqueza, ver [@GomezAparicio2009; @PerezLuque2014]); y **fc** un factor de correción que tiene en cuenta
 
 $$ fc = w_1 \cdot Reg + w_2 \cdot DistanciaFuenteSemillera + w_3 \cdot TreeDensity $$ 
 
@@ -208,12 +208,262 @@ Para cada pixel de pinar se computan las distancias entre su centroide y los bor
 
 
 
+# Dispersal module 
 
-Dentro de nuestro modelo vamos a considerar dos módulos de 
+Elementos a considerar (sensu [@Nathan2012]: 
 
-la densidad de las plantaciones, 
+* Start-point (source)
+* Disperser 
+* End-point (target)
 
-### ~ uso
+## Seed source 
+
+### Aspecto cualitativo 
+
+* Mayor diversidad de especies en la fuente semillera, mayor diversidad de semillas
+
+* Cualitativamente mamíferos y aves frugívoras dispersan semillas de especies similares [@Zamora2010]. 
+
+* Aproximadamente la mitad de las especies leñosas de fruto carnoso en el área de estudio son dispersadas por los vectores (mamíferos y/o aves) [@Zamora2010 @Matias2010 @Mendoza2009]
+
+Por tanto, ¿cuantas especies potencialmente pueden dispersar?. 
+
+@Mendoza2009 habla de que en la zona de estudio hay hasta 20 especies de fruto carnoso. @GomezAparicio2009 ofrece datos de riqueza potencial para encinares y robledales: 
+
+* encinares 1.39 (1.07 - 1.77)
+* robledales 3.80 (2.96 - 4.75)
+
+[issue #13](https://github.com/ajpelu/respine/issues/13)
+
+### Aspecto cuantitativo 
+
+* Se refiere a la cantidad de semillas existentes en la fuente semillera. En este caso, no lo estamos considerando, pero deberíamos tenerlo en cuenta en el futuro (?)
+
+## Disperser 
+
+### Tipos 
+
+Vamos a considerar tres tipos de dispersores (zoócoros):
+
+* small birds
+* medium birds
+* mammals 
+
+### Cuanta cantidad de dispersores? 
+El usuario podrá decidir el porcentaje de cada tipo de dispersor 
+Hemos de tener en cuenta que no son excluyentes, por tanto, en la aplicación haremos que la selección sea sumatoria (ver [issue #14](https://github.com/ajpelu/respine/issues/14)) 
+
+### Características de cada tipo de dispersor 
+
+#### Kernel 
+Cada tipo de dispersor tiene un kernel de dispersión caracterizado por: modelo y distancia 
+
+* Small birds [@Jordano2007 @Zamora2010]: 
+    * raramente pasan de 100 m (rango 0 - 100)
+    * El 50 % de las semillas son dispersadas en los primeros 51 m 
+
+* Medium birds:
+    * El 50 % de las semillas son dispersadas mas allá de los 110 m
+  
+* Mammals [@Jordano2007 @Matias2010]
+    * rango 0 hasta > 1500 m
+    * El 50 % de las semillas son dispersadas mas allá de los 495 m
+    * Pico de dispersión entre 650 - 700 m
+
+* Arrendajo [@Gomez2003 @Pons2007]
+    * rango 5 - 1000 [@Gomez2003]; 3 - 550 [@Pons2007]
+    * Pico de dispersión en función del tipo de parche destino. General a 262 m, repoblaciones a 402 m [@Gomez2003]
+    * Muy dependiente del paisaje 
+  
+
+| tipo         | rango    | peak                | 50 %  |
+|--------------|----------|---------------------|-------|
+| Small birds  | 0 - 100  |                     | < 51  |
+| Medium birds |          |                     | > 110 |
+| Mammals      | 0 - 990  | 650 - 700           | > 495 |
+| Arrendajo    | 5 - 1000 | 262.9 (mediana 200) |       |
+|              |          | 402 (med. 450)      |       |
+|              | 3 - 550  | 68                  |       |
+
+
+Existen varios modelos de kernels. 
+
+#### Kernel Arrendajo 
+
+* En general la curva tiene 2 picos: uno local dentro del mismo parche de vegetación (oak patch) (1-20 m) y otro a larga distancia hacia pinares (ca 200 m) [@Gomez2003]. Podríamos hablar de un proceso estratificado, dependiente del sitio y condicionado por la alta heterogeneidad del paisaje. 
+
+* El segundo pico es mucho mayor que el primero, lo cual es contrario a la mayoría de los casos reportados donde a partir de una determinada distancia disminuyen la frecuencia. 
+
+El modelo que mejor se ajusta es: 
+
+$$ u^{-1} = 0.14 + 2.17 \log r - 2.50 (\log r)^2 + 0.70 (\log r)^3 $$
+
+siedo $u$ la densidad o porcentaje de vuelos hechos por el arrendajo a una distancia $r$ desde la fuente semillera 
+
+
+* Si atendemos al tipo de parche de destino, las curvas cambian. Así para las repoblaciones el modelo que mejor se ajusta es el inverso polinomial 
+
+$$ u^{-1} = -0.10 + 0.02 r + 0.04 r^2 $$
+
+[@Pons2007] encontró que el mejor kernel de dispersion es el modelo log-normal, con valores medios de 3.844 (location parameter, log-scale) y y una desviación estandar de 0.851 (shape parameter, log-scale)
+
+#### Kernel Mamíferos 
+@GonzalezVaro2013 estudió kernels de dispersion para varios mamíferos carnívoros y encontró varios modelos. 
+
+
+
+#### Kernel small birds 
+
+#### Kernel medium bird 
+
+
+```{r, echo=FALSE}
+library(dplyr)
+library(ggplot2)
+library(fitdistrplus)
+
+# --------------------
+# Arrendajo from Gomez 2003 
+dis <- c(10, 30, 50, 70, 90, 150, 250, 350, 450, 550, 700, 900)
+per <- c(1.07, 1.40, 2.34, 3.78, 9.82, 33.01, 16.11, 11.40, 10.06, 10.33, 4.89, 0.77)
+df <- data.frame(cbind(dis, per))
+
+df <- df %>% 
+  mutate(k = -0.1 + 0.02*log(dis) + 0.04*(log(dis^2)),
+         u = 1/k) 
+
+df %>% ggplot(aes(x=dis, y=u)) + geom_point() + geom_smooth()
+
+# Fit a lognormal and weibull
+arre_lnorm <- fitdist(df$per, "lnorm")
+arre_w <-  fitdist(df$per, "weibull")
+# -------------------- 
+
+
+
+grid <- seq(0,1500,1)
+# Arrendajo (Pons & Pausas 2007)
+plot(dlnorm(grid,meanlog = 3.844, sdlog = 0.851), col='blue', 
+     type="l")
+
+# kernel para mamíferos González-Varo et al. 2012 http://onlinelibrary.wiley.com/doi/10.1111/1365-2656.12024/full
+lines(grid, 
+      ifelse(grid <= 400,
+             dweibull(grid, shape = 1.385, scale = 137),
+             dlnorm(grid, meanlog = 6.621, sdlog = 0.297)),
+      type="l",xlab="x",ylab="f(x)", col='red')
+
+
+lines(grid, 
+      dlnorm(grid, meanlog = log(200), 
+               sdlog= arre_lnorm$estimate["sdlog"]), col='blue', 
+      lty=2)
+
+lines(grid, 
+      dweibull(grid, 
+               shape = arre_w$estimate["shape"], 
+               scale = 88),
+      col='blue', lty=6)
+      
+
+lines(grid, 
+      dlnorm(grid,meanlog = arre_lnorm$estimate["meanlog"], 
+             sdlog= arre_lnorm$estimate["sdlog"]), col='blue', 
+      lty=2)
+
+dis <- data.frame(d = seq(1,1000, b=1))
+
+dis <- dis %>% 
+  mutate(k = -0.1 + 0.02*d + 0.04*(d^2), 
+         u = 1/k,
+         u2 = 1/(-0.1 - 0.02*(log(d)) + 0.04*((log(d))^2)),
+         gu = 1/(0.14 - 2.17*(log(d)) - 2.50*((log(d))^2) + 0.7*((log(d))^3))) 
+
+dis %>% filter(u > 0) %>% 
+  ggplot(aes(x=d, y=gu)) + geom_line()
+
+#### Proposal 
+
+data <- data.frame(
+  dis = seq(0,1500,1))
+
+data <- data %>% 
+  mutate(
+    sb = dlnorm(dis, meanlog = log(51), sdlog = .9), 
+    mb = dlnorm(dis, meanlog = log(151), sdlog = 1),
+    ma = ifelse(dis <= 400,
+                dweibull(dis, shape = 1.385, scale = 137),
+                dlnorm(dis, meanlog = 6.621, sdlog = 0.297)),
+    gg = dlnorm(dis, meanlog = log(450), sdlog = 1))
+
+
+data %>% ggplot(aes(x=dis)) + 
+  geom_line(aes(x=dis, y=sb), color='blue') +
+  geom_line(aes(x=dis, y=mb), color='black') +
+  geom_line(aes(x=dis, y=ma), color='red') +
+  geom_line(aes(x=dis, y=gg), color='green') + 
+  scale_x_continuous(breaks = seq(0,1500, 100)) + 
+  theme_bw() + 
+  theme(panel.grid = element_blank()) +
+  ylab('f(x)') + 
+  annotate("text", 
+           x= 1000, y = 0.010, 
+           label=("blue = sb, red = ma, black=mb, green = gg"))
+```  
+
+[issue #15](https://github.com/ajpelu/respine/issues/15)
+
+* unimodal versus multimodal? 
+
+
+### Cuanto dispersa cada dispersor 
+
+Sabemos que los mamíferos dispersan menos cantidad que los pájaros. El propagule input es de 95 % para los pájaros (3.7 seeds/m2 year) y de solo el 5 % para los mamíferos [@Zamora2010]. Habría que considerar alguna manera de introducir esto. Quizá en el load inicial cuando se elige el dispersor predominante. Quizá pueda servir para modular el avance con el tiempo, sería el propagule input anual 
+
+### Introducción de nuevas especies 
+Los mamíferos al ser Long-distance disperser pueden introducir nuevas especies (generalmente agrícolas)
+
+
+## End-point (target)
+
+* Mamíferos son indiferentes del target point 
+* Las aves son muy dependientes del contexto (paisaje). 
+
+¿Como modelar el contexto? 
+
+* Mamíferos (independientes del contexto [@Matias2010, @Zamora2010])
+* Arrendajo:
+    * prefieren los pinares de repoblación para dispersar [@Gomez2003]
+    * [@Pons2007] también encontró que los arrendajos no dispersaban aleatoriamente las bellotas entre los hábitas. Evitan matorrales. A largas distancias prefeieren pinares
+* Small and Medium birds: 
+    * Adyacencia: A mayor adyacencia mayor densidad de dispersores y también menor seed limitation
+    
+Propuesta: 
+
+* mamíferos independiente 
+* aves (incluido arrendajo): > adjacencia ---> > probabilidad contacto ---> > dispersion 
+
+Medir la adjacencia y aumentar la probabilidad de aumentar la riqueza en función de la adjacencia. 
+
+
+# References
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

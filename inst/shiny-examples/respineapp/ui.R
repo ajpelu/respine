@@ -58,7 +58,16 @@ navbarPage("Respine App", id = "navbar",
                  selectInput(inputId = "pp_pastUse",
                              label = "Uso del pasado",
                              choices = c('Bosque natural', 'Matorral', 'Pastizal', 'Cultivo'),
-                             selected = 'Matorral')
+                             selected = 'Matorral'),
+                 br(),
+
+                 # disperser
+                 h4('Dispersantes'),
+                 sliderInput(inputId = "small_bird",
+                             label = "Aves pequeño tamaño",
+                             min = 0, max = 100, value = 0, step = 1),
+                 uiOutput("medium_bird"),
+                 tableOutput("restable")
 
                  ),
                mainPanel(
