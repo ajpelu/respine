@@ -2,13 +2,10 @@
 title: "Notas Funcionamiento"
 author: "Antonio J Perez-Luque"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: pdf_document
 bibliography: REFERENCES.bib
 csl: ecology.csl
-vignette: >
-  %\VignetteIndexEntry{Vignette Title}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+
 
 
 ```{r}
