@@ -9,11 +9,20 @@ library('sp')
 library('rgeos')
 
 
-m <- matrix(nrow=75, ncol=75, byrow = TRUE)
+
+ancho <- 63 * 2
+alto <- 53 * 2
+m <- matrix(nrow=alto, ncol=ancho, byrow = T)
 r <- raster(m)
-extent(r) <- matrix(c(0, 0, 50, 50), nrow=2)
-# Set default value
+extent(r) <- matrix(c(0, 0, ancho, alto), nrow=2)
 r[] <- 0
+
+
+# m <- matrix(nrow=75, ncol=75, byrow = TRUE)
+# r <- raster(m)
+# extent(r) <- matrix(c(0, 0, 50, 50), nrow=2)
+# # Set default value
+# r[] <- 0
 
 # Total nCells
 size_landscape <- ncell(r)
@@ -36,7 +45,7 @@ navbarPage("Respine App", id = "navbar",
                  h4("Pinar de Repoblación"),
                  sliderInput(inputId = "size_pp",
                              label = "Tamaño de la repoblación de pinar",
-                             min = 300, max = 6000, value = 4500),
+                             min = 200, max = 1500, value = 750),
                  selectInput(inputId = "density_pp",
                              label = "Densidad de la plantación",
                              choices = c('baja', 'media', 'alta'),
@@ -50,7 +59,7 @@ navbarPage("Respine App", id = "navbar",
                              min = 1, max= 5, value =2),
                  sliderInput(inputId = "size_nf",
                              label = "Tamaño",
-                             min = 10, max = 500, value = 350),
+                             min = 50, max = 500, value = 250),
                  br(),
 
                  # pastUse

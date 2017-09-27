@@ -11,9 +11,13 @@ library('rgeos')
 
 # Crear landscape vacío
 set.seed(123)
-m <- matrix(nrow=100, ncol=200, byrow = T)
+
+ancho <- 63 * 2
+alto <- 53 * 2
+
+m <- matrix(nrow=alto, ncol=ancho, byrow = T)
 r <- raster(m)
-extent(r) <- matrix(c(0, 0, 200, 100), nrow=2)
+extent(r) <- matrix(c(0, 0, ancho, alto), nrow=2)
 r[] <- 0
 
 source('createLandscape.R', local=TRUE)

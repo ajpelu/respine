@@ -3,7 +3,7 @@
 #' Compute the distance between each pixel and the edges of all natural forests.
 #' Then get the minimun distance for each pixel.
 #'
-#' @param r A \code{raster} object
+#' @param x A \code{raster} object
 #'
 #' @param nf_value The value of "Natural Forests" class within the raster (Default value = 2)
 #'

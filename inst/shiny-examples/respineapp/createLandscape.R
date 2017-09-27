@@ -24,7 +24,7 @@ createLandscape <- function(r, size_pp, n_nf, size_nf){
   # Create pine plantation patch
   pp <- makeClass(r, val=1, npatch = 1, rast=TRUE,
                   size = size_pp,
-                  pts = matrix(c(100,50), nrow=1, ncol=2))
+                  pts = matrix(c(75,75), nrow=1, ncol=2))
 
   # Create natural forest patchs
   nf <- makeClass(pp, val=2, rast=TRUE,
@@ -51,3 +51,8 @@ createLandscape <- function(r, size_pp, n_nf, size_nf){
   return(l)
 
 }
+
+
+
+
+
