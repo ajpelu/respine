@@ -131,8 +131,205 @@ vv <- disper_time(msb = v[['msb']],
                   per_sb = per_sb, per_mb = per_mb, per_ma = per_ma,
                   propaguleInputBird = piB,
                   propaguleInputMammal = piM,
-                  time_span = 50)
+                  time_span = 10)
 
+
+
+
+
+
+x=myl
+xr=mapa_riqueza
+nf_value = 2
+pp_value = 1
+
+
+
+rich_nf <- calc(stack(x, xr), fun=function(x) ifelse(x[1] == nf_value, x[1]*x[2], NA))
+rich_pp <- calc(stack(x, xr), fun=function(x) ifelse(x[1] == pp_value, x[1]*x[2], NA))
+
+
+nf_edges <- rasterToPolygons(x, fun=function(x){x == nf_value}, dissolve = TRUE)
+
+i <- 1
+
+
+# Contribution from each Natural Forest patch
+## Get boundary limits of NF, and save as shapefile
+nf_edges <- rasterToPolygons(x, fun=function(x){x == nf_value}, dissolve = TRUE)
+
+## Dissagregate nf polygons
+nf_pol <- disaggregate(nf_edges)
+
+
+edges <- rasterToPolygons(x, fun=function(x){x %in% c(nf_value, pp_value)}, dissolve = TRUE)
+
+
+Touching_List <- gTouches(edges, byid = TRUE, returnDense=FALSE)
+
+
+
+
+
+
+
+i <- 5
+# Operations for each polygon
+for (i in 1:length(nf_pol)) {
+
+  # Distance between el NF polygon i and all cells of the raster
+  d  = gDistance(nf_pol[i,], as(x,"SpatialPoints"), byid=TRUE)
+  dnf_i <- x
+  dnf_i[] = apply(d,1,min) # Minimun distance
+  names(dnf_i) <- paste0('nf',i) # Add name of layer (nfi, i is the number)
+
+  dnf_i10 <- calc(dnf_i, fun = function(x){x*10}) # Multiply to 10 meters
+  names(dnf_i10) <- paste0('nf',i,'_meters')
+
+  ## Richess values for each nf i
+  rich_nf_i <- mask(xr, nf_pol[i,])
+  rpot_i <- cellStats(rich_nf_i, mean)
+
+
+
+
+  # Adjacency module
+  ## Rasterize nfi
+  aux_nfi <- rasterize(nf_pol[i,], x)
+  aux_nfi[aux_nfi == 1] <- nf_value
+  aux_nfi[is.na(aux_nfi[])] <- 0
+
+  # Rasterize pine plantations
+  aux_pine <- calc(x, fun = function(x) ifelse(x == pp_value, pp_value, 0))
+
+  # Merge two raster
+  aux <- calc(stack(aux_nfi, aux_pine), fun = function(x){x[1]+x[2]})
+  aux[aux == 0] <- NA
+
+  # Vectorize all
+  # https://stackoverflow.com/questions/45338384/calculate-the-length-of-shared-boundaries-between-multiple-polygons
+  aux_shape <- rasterToPolygons(aux, dissolve = TRUE)
+  aux_shape_pine <- rasterToPolygons(aux, fun=function(x){x == pp_value}, dissolve = TRUE)
+
+  # perimeter pine
+  perimeter_pine <- rgeos::gLength(aux_shape_pine)
+
+  # Which object touch to which
+  touching_list <- rgeos::gTouches(aux_shape, byid = TRUE, returnDense=FALSE)
+
+
+  # Loop para ver si el poligono esta compartiendo frontera
+  if (is.null(touching_list$`1`)) {
+
+    l_lines <- 0
+
+  } else {
+    # ---- Calculate perimeters of all polygons ----
+    perimeters <- sp::SpatialLinesLengths(as(aux_shape, "SpatialLines"))
+
+    from <- 1
+    lines <- rgeos::gIntersection(aux_shape[from,], aux_shape[touching_list[[from]],], byid = TRUE)
+
+    l_lines <- sp::SpatialLinesLengths(lines)
+
+    }
+
+  # plot(aux_shape[c(from, touching_list[[from]]),])
+  # plot(lines, add = TRUE, col = 'red', lwd = 2)
+
+# adjacency index (0 - 1)
+  ai <- l_lines/perimeter_pine
+
+
+  # Dispersion contribution
+  ## Small bird dispersion
+  sb_i <- calc(dnf_i10, fun = function(x){dlnorm(x, meanlog = log(51), sdlog = .7)})
+  names(sb_i) <- paste0('sb',i)
+  sb_i_pot <- sb_i * 0.5 * rpot_i # Asumimos que coge la mitad de las semillas (mejorar)
+  names(sb_i_pot) <- paste0('sb',i, 'pot')
+
+  ## Medium bird dispersion
+  mb_i <- calc(dnf_i10, fun = function(x){dlnorm(x, meanlog = log(201), sdlog = .7)})
+  names(mb_i) <- paste0('mb',i)
+  mb_i_pot <- mb_i * 0.5 * rpot_i # Asumimos que coge la mitad de las semillas (mejorar)
+  names(mb_i_pot) <- paste0('mb',i, 'pot')
+
+  ## Mammal dispersion
+  ma_i <- calc(dnf_i10, fun = function(x){
+    ifelse(x <= 400, dweibull(x, shape = 1.385, scale = 137),
+           dlnorm(x, meanlog = 6.621, sdlog = 0.297))})
+  names(ma_i) <- paste0('ma',i)
+  ma_i_pot <- ma_i * ((0.5 * rpot_i) + 1)  # Asumimos que coge la mitad de las semillas (mejorar). Ademas añadimos semillas de tierras agrícolas (maximo 3)
+  names(ma_i_pot) <- paste0('ma',i, 'pot')
+
+  rasters_i <- stack(dnf_i10,
+                     sb_i, mb_i, ma_i,
+                     sb_i_pot, mb_i_pot, ma_i_pot)
+
+  nf_singles <- stack(nf_singles, rasters_i)
+
+  sb <- stack(sb, sb_i)
+  mb <- stack(mb, mb_i)
+  ma <- stack(ma, ma_i)
+
+  sbpot <- stack(sbpot, sb_i_pot)
+  mbpot <- stack(mbpot, mb_i_pot)
+  mapot <- stack(mapot, ma_i_pot)
+}
+
+# Compile an unique raster by disperser vector (sum all single raster )
+r_sbpot <- sum(sbpot)
+names(r_sbpot) <- 'r_sbpot'
+r_mbpot <- sum(mbpot)
+names(r_mbpot) <- 'r_mbpot'
+r_mapot <- sum(mapot)
+names(r_mapot) <- 'r_mapot'
+
+
+# Mask by pine plantantion
+## Pine plantations boundary
+pp_limit <- rasterToPolygons(x, fun=function(x){x == pp_value}, dissolve = TRUE)
+
+msb <- mask(r_sbpot, pp_limit)
+names(msb) <- 'msb' # mask small bird
+mmb <- mask(r_mbpot, pp_limit)
+names(mmb) <- 'mmb' # mask medium bird
+mma <- mask(r_mapot, pp_limit)
+names(mma) <- 'mma' # mask mammal
+
+out <- stack(nf_singles,
+             r_sbpot, r_mbpot, r_mapot,
+             msb, mmb, mma)
+
+return(out)
+
+
+
+r <- raster(nrows=10, ncols=10)
+adj <- adjacency(raster=r, fromCells = c(1,30,55,72,100), toCells = c(1:ncell(r)), directions=4)
+
+
+r <- raster(nrow=18, ncol=36, xmn=0)
+r[150:250] <- 1
+r[251:450] <- 2
+b <- boundaries(r, type='inner')
+plot( boundaries(r, type='outer') )
+plot( boundaries(r, classes=TRUE) )
+
+r <- raster(nrows=10, ncols=10)
+adjacent(r, cells=c(1, 55), directions=8, pairs=TRUE)
+
+a <- adjacent(r, cell = c(1,55,90), directions=4, sorted=TRUE)
+a
+
+
+
+r <- raster(ncols=12, nrows=12)
+set.seed(0)
+r[] <- round(runif(ncell(r))*0.7 )
+rc <- clump(r)
+freq(rc)
+plot(rc)
 
 
 
@@ -170,6 +367,10 @@ ola <- initRichness(r, r_range, treedensity, pastUse, rescale=TRUE)
 
 
 
+
+
+
+
 library(ks)
 library(KernSmooth)
 library(raster)
@@ -197,6 +398,10 @@ https://cran.r-project.org/web/packages/splancs/splancs.pdf
 library(dplyr)
 library(ggplot2)
 library(fitdistrplus)
+
+
+
+
 
 
 
@@ -324,3 +529,41 @@ plot(nc.sids)
 plot(xxnb, coordinates(nc.sids), add=TRUE, col="blue")
 
 
+
+
+require("rgdal")
+require("rgeos")
+library(sp)
+library(raster)
+
+download.file("https://www.dropbox.com/s/vbxx9dic34qwz63/Polygons.zip?dl=1", "Polygons.zip")
+
+unzip("./Polygons.zip")
+Shapefile <- readOGR(".","Polygons")
+
+plot(edges, col=edges@data)
+
+
+Touching_List <- gTouches(edges, byid = TRUE, returnDense=FALSE)
+
+# Touching_DF <- setNames(utils::stack(lapply(Touching_List, as.character)), c("TOUCHING", "ORIGIN"))
+
+# ---- Calculate perimeters of all polygons ----
+perimeters <- sp::SpatialLinesLengths(as(edges, "SpatialLines"))
+
+# ---- Example with the first object of the list and first neighbor ----
+from <- 1
+to <- 1
+line <- rgeos::gIntersection(edges[from,], edges[Touching_List[[from]][to],])
+l_line <- sp::SpatialLinesLengths(line)
+
+plot(edges[c(from, Touching_List[[from]][to]),])
+plot(line, add = TRUE, col = "red", lwd = 2)
+
+# ---- Example with the first object of the list and all neighbors ----
+from <- 1
+lines <- rgeos::gIntersection(Shapefile[from,], Shapefile[Touching_List[[from]],], byid = TRUE)
+l_lines <- sp::SpatialLinesLengths(lines)
+
+plot(Shapefile[c(from, Touching_List[[from]]),])
+plot(lines, add = TRUE, col = 1 + 1:length(Touching_List[[from]]), lwd = 2)
