@@ -21,15 +21,15 @@ shiny; cambio climático; resiliencia; pinares de repoblación
 
 Los escenarios de cambio climático predicen un incremento en la frecuencia de eventos extremos (*i.e.* sequía), que puede provocar una reducción en la resiliencia de los ecosistemas, es decir, en la capaciad para recuperar sus propiedades tras una una perturbación. 
 
-En la cuenca Mediterránea durante la segunda mitad del siglo XX, se llevaron a cabo plantaciones de pinares para solventar problemas de erosión de algunas zonas. Estos pinares de repoblación se caracterizan por ser ecosistemas muy homogéneos, con gran densidad de árboles y poca diversidad de especies, presentando poca resiliencia frente a eventos extremos. 
+En la cuenca Mediterránea durante la segunda mitad del siglo XX, se llevaron a cabo plantaciones de pinares para solventar problemas de erosión de algunas zonas. Estos pinares de repoblación se caracterizan por ser ecosistemas muy homogéneos, con gran densidad de árboles y poca diversidad de especies, lo que dificulta su capacidad de respuesta frente a eventos extremos. 
 
-Los ecosistemas con mayor diversidad de especies son potencialmente mas resilientes ante alguna perturbación. Por tanto las acciones de gestión en los pinares de repoblación han de ir encaminadas a aumentar la diversidad de especies, para así aumentar su resiliencia. 
+Los ecosistemas con mayor diversidad de especies son potencialmente mas resilientes ante alguna perturbación. Por tanto las acciones de gestión en los pinares de repoblación han de ir encaminadas a aumentar la diversidad de tipos funcionales de especies y su heterogeneidad espacial, para así aumentar su resiliencia. 
 
 En este trabajo presentamos un aplicación interactiva (*shiny*) (***ResPine*** - Resilience of Pine plantations) creada para mostrar como la diversidad de especies presentes en los pinares de repoblación varía en función de diversos aspectos: configuración del paisaje; estructura interna de la repoblación (usos del suelo en el pasado, densidad de árboles); composición de los vectores de dispersión (aves, mamíferos). El usuario puede modificar interactivamente diferentes parámetros y observar como varía la riqueza de especies con el tiempo, y por tanto la resiliencia del ecosistema. 
 
 Para construir esta aplicación divulgativa se ha utilizado el lenguaje R y la tecnología Shiny [@shiny2017]. La simulación del comportamiento de cada actor (pinares de repoblación, vectores de dispersion, paisaje, etc.) se ha realizado construyendo funciones específicas en R, basadas en los resultados obtenidos en diversos trabajos de investigación [@GomezAparicio2009; @Gonzalez2011; @Navarro2013; @Zamora2010; @Matias2010]. 
 
-Esta aplicación permite a los usuarios visualizar algunos de los complejos mecanismos ecológicos que operan en los ecosistemas mediterráneos; así como comprender la importancia de la diversidad de especies dentro de estos ecosistemas. Además es una forma de transferir conocimiento científico generado por grupos de investigación a la sociedad de una forma divulgativa.
+Esta aplicación permite a los usuarios visualizar algunos de los complejos mecanismos ecológicos que operan en los ecosistemas mediterráneos; así como comprender la importancia de la diversidad de especies dentro de estos ecosistemas. Además es una forma de transferir conocimiento científico generado por grupos de investigación de la UGR a la sociedad de una forma divulgativa.
 
 Esta aplicación se ha generado en el marco del proyecto **LIFE-ADAPTAMED** (LIFE14 CCA/ES/000612): *Protección de servicios ecosistémicos clave amenazadas por el camibo climático mediente gestión adaptativa de socioecosistemas mediterráneos*. 
 
