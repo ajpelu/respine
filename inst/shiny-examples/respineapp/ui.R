@@ -35,67 +35,40 @@ size_landscape <- ncell(r)
 
 
 navbarPage("Respine App", id = "navbar",
-           tabPanel(
-             title = "Configurar Paisaje",
-             value = 'panel1',
-             # Side bar
-             sidebarLayout(
-               sidebarPanel(
-                 # pp
-                 h4("Pinar de Repoblación"),
-                 sliderInput(inputId = "size_pp",
-                             label = "Tamaño de la repoblación de pinar",
-                             min = 200, max = 1500, value = 750),
-                 selectInput(inputId = "density_pp",
-                             label = "Densidad de la plantación",
-                             choices = c('baja', 'media', 'alta'),
-                             selected = 'media'),
-                 br(),
+  tabPanel(title = "Configurar Paisaje Inicial", value = 'panel1',
+    # Sidebar
+     sidebarLayout(
+       sidebarPanel(
+        h4("Pinar de Repoblación"),
+        sliderInput(inputId = "size_pp", label = "Tamaño de la repoblación de pinar",
+                    min = 200, max = 1500, value = 750),
+        selectInput(inputId = "density_pp", label = "Densidad de la plantación",
+                    choices = c('baja', 'media', 'alta'),
+                    selected = 'media'),
+        br(),
+        h4("Bosques naturales"),
+        sliderInput(inputId = "n_nf",label = "Nº bosques naturales",
+                    min = 1, max= 5, value =2),
+        sliderInput(inputId = "size_nf", label = "Tamaño",
+                    min = 50, max = 500, value = 250),
+        br(),
+        h4('Usos del pasado'),
+        selectInput(inputId = "pp_pastUse", label = "Uso del pasado",
+                    choices = c('Bosque natural', 'Matorral', 'Pastizal', 'Cultivo'),
+                    selected = 'Matorral'),
+        br(),
+        h4('Dispersantes'),
+        sliderInput(inputId = "small_bird",label = "Aves pequeño tamaño",
+                    min = 0, max = 100, value = 0, step = 1),
+        uiOutput("medium_bird"),
+        tableOutput("restable")),
 
-                 # nf
-                 h4("Bosques naturales"),
-                 sliderInput(inputId = "n_nf",
-                             label = "Nº bosques naturales",
-                             min = 1, max= 5, value =2),
-                 sliderInput(inputId = "size_nf",
-                             label = "Tamaño",
-                             min = 50, max = 500, value = 250),
-                 br(),
+       mainPanel(
+         tabsetPanel(
+           tabPanel("Paisaje Inicial", value = 'panel2',
+                    plotOutput(outputId = 'initial_map')),
+           tabPanel("Mapa de Riqueza Inicial", value = 'panel3',
+                    plotOutput(outputId = 'richness_map'))
+                    )))))
 
-                 # pastUse
-                 h4('Usos del pasado'),
-                 selectInput(inputId = "pp_pastUse",
-                             label = "Uso del pasado",
-                             choices = c('Bosque natural', 'Matorral', 'Pastizal', 'Cultivo'),
-                             selected = 'Matorral'),
-                 br(),
 
-                 # disperser
-                 h4('Dispersantes'),
-                 sliderInput(inputId = "small_bird",
-                             label = "Aves pequeño tamaño",
-                             min = 0, max = 100, value = 0, step = 1),
-                 uiOutput("medium_bird"),
-                 tableOutput("restable")
-
-                 ),
-               mainPanel(
-                 tabsetPanel(
-                   tabPanel("Pinares de Repoblación", includeMarkdown('chose_pp.md')),
-                   tabPanel("Bosques Naturales", includeMarkdown('chose_nf.md')),
-                   tabPanel("Uso del Suelo Pasado", includeMarkdown('chose_pastUse.md'))
-                   )
-                 )
-               )),
-
-  ### tab 2
-  tabPanel("Paisaje Inicial", value = 'panel2',
-           plotOutput(outputId = 'initial_map')
-           ),
-
-  ### tab 3
-  tabPanel("Mapa de Riqueza Inicial", value = 'panel3',
-           plotOutput(outputId = 'richness_map')
-           )
-
-  )

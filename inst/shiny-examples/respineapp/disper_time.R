@@ -54,6 +54,9 @@ disper_time <- function(msb, mmb, mma,
                       fun = function(x) ifelse(
                         x[1] == pp_value, x[1]*x[3], x[2]))
 
+    names(rich_time) <- paste0('rich_y',i)
+    rich_time[rich_time == 0] <- NA
+
     out <- stack(out, rich_time)}
 
   return(out)

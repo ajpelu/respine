@@ -18,8 +18,7 @@
 #' @author Antonio J Perez-Luque
 
 
-disper <- function(x, xr, nf_value, pp_value,
-                   per_sb, per_mb, per_ma) {
+disper <- function(x, xr, nf_value, pp_value) {
 
   # Output stacks
   nf_singles <- stack()
@@ -33,6 +32,14 @@ disper <- function(x, xr, nf_value, pp_value,
   # Get richness for natural forest and Pine plantations
   rich_nf <- calc(stack(x, xr), fun=function(x) ifelse(x[1] == nf_value, x[1]*x[2], NA))
   rich_pp <- calc(stack(x, xr), fun=function(x) ifelse(x[1] == pp_value, x[1]*x[2], NA))
+
+
+  # Rasterize pine plantations
+  aux_pine <- calc(x, fun = function(x) ifelse(x == pp_value, pp_value, 0))
+
+  # Get polygons of pine plantation and length
+  aux_shape_pine <- rasterToPolygons(aux_pine, fun=function(x){x == pp_value}, dissolve = TRUE)
+  perimeter_pine <- rgeos::gLength(aux_shape_pine)
 
   # Contribution from each Natural Forest patch
   ## Get boundary limits of NF, and save as shapefile
@@ -52,21 +59,63 @@ disper <- function(x, xr, nf_value, pp_value,
     dnf_i10 <- calc(dnf_i, fun = function(x){x*10}) # Multiply to 10 meters
     names(dnf_i10) <- paste0('nf',i,'_meters')
 
-    ## Richess values for each nf i
+    # --- Richess values for each nf i ---
     rich_nf_i <- mask(xr, nf_pol[i,])
     rpot_i <- cellStats(rich_nf_i, mean)
 
-    # Dispersion contribution
+    # --- Adjacency module ----
+    ## Rasterizar nf i
+    aux_nfi <- rasterize(nf_pol[i,], x)
+    aux_nfi[aux_nfi == 1] <- nf_value
+    aux_nfi[is.na(aux_nfi[])] <- 0
+
+    # Merge nf i and aux_pine
+    aux <- calc(stack(aux_nfi, aux_pine), fun = function(x){x[1]+x[2]})
+    aux[aux == 0] <- NA
+
+    # Get polygons of pine plantation and nf i
+    aux_shape <- rasterToPolygons(aux, dissolve = TRUE)
+
+    intersectan <- rgeos::gIntersects(aux_shape[1,], aux_shape[2,])
+    if (intersectan == TRUE){
+      # Calcula la intersection
+      inter <- rgeos::gIntersection(aux_shape[1,], aux_shape[2,], byid = FALSE)
+      # esto es por el problema de las classes de rgeos
+      if (class(inter)[1] == "SpatialLines") {
+        # compute length inter
+        length_inter <- sp::SpatialLinesLengths(inter)
+      } else {
+        interL <- as(inter@lineobj, "SpatialLines")
+        length_inter <- sum(sp::SpatialLinesLengths(interL))
+          }
+      } else {
+        length_inter <- 0
+      }
+
+
+    # Compute the adjacency of each nf i
+    adj <- ( length_inter / perimeter_pine)*100
+
+    # Seedlimitation using adjacency (only for bird)
+    seed_limitation_i <- 1/(0.736658946 -0.004037077 * adj)
+    # min and max of inverse seed limitation (adj=0 and adj=100)
+    sl0 <- 1/(0.736658946 -0.004037077 * 0)
+    sl100 <- 1/(0.736658946 -0.004037077 * 100)
+    # standardize inverse seed limitation
+    adjF <- ((seed_limitation_i - sl0) / (sl100 - sl0)) + 0.5
+
+
+    # --- Dispersion contribution
     ## Small bird dispersion
     sb_i <- calc(dnf_i10, fun = function(x){dlnorm(x, meanlog = log(51), sdlog = .7)})
     names(sb_i) <- paste0('sb',i)
-    sb_i_pot <- sb_i * 0.5 * rpot_i # Asumimos que coge la mitad de las semillas (mejorar)
+    sb_i_pot <- sb_i * 0.5 * rpot_i * adjF # Asumimos que coge la mitad de las semillas (mejorar)
     names(sb_i_pot) <- paste0('sb',i, 'pot')
 
     ## Medium bird dispersion
     mb_i <- calc(dnf_i10, fun = function(x){dlnorm(x, meanlog = log(201), sdlog = .7)})
     names(mb_i) <- paste0('mb',i)
-    mb_i_pot <- mb_i * 0.5 * rpot_i # Asumimos que coge la mitad de las semillas (mejorar)
+    mb_i_pot <- mb_i * 0.5 * rpot_i * adjF # Asumimos que coge la mitad de las semillas (mejorar)
     names(mb_i_pot) <- paste0('mb',i, 'pot')
 
     ## Mammal dispersion
@@ -102,14 +151,11 @@ disper <- function(x, xr, nf_value, pp_value,
 
 
   # Mask by pine plantantion
-  ## Pine plantations boundary
-  pp_limit <- rasterToPolygons(x, fun=function(x){x == pp_value}, dissolve = TRUE)
-
-  msb <- mask(r_sbpot, pp_limit)
+  msb <- mask(r_sbpot, aux_shape_pine)
   names(msb) <- 'msb' # mask small bird
-  mmb <- mask(r_mbpot, pp_limit)
+  mmb <- mask(r_mbpot, aux_shape_pine)
   names(mmb) <- 'mmb' # mask medium bird
-  mma <- mask(r_mapot, pp_limit)
+  mma <- mask(r_mapot, aux_shape_pine)
   names(mma) <- 'mma' # mask mammal
 
   out <- stack(nf_singles,
