@@ -10,7 +10,7 @@ library(landscapeR)
 library(rasterVis)
 library(rgeos)
 
-### 1 ####
+### 1 ####
 set.seed(333)
 # m <- matrix(nrow=53, ncol=63, byrow = T)
 # r <- raster(m)
@@ -193,8 +193,8 @@ for (i in 1:length(nf_pol)) {
 
 
 
-  # Adjacency module
-  ## Rasterize nfi
+  # --- Adjacency module ----
+  ## Rasterizar nf i
   aux_nfi <- rasterize(nf_pol[i,], x)
   aux_nfi[aux_nfi == 1] <- nf_value
   aux_nfi[is.na(aux_nfi[])] <- 0
@@ -206,19 +206,18 @@ for (i in 1:length(nf_pol)) {
   aux <- calc(stack(aux_nfi, aux_pine), fun = function(x){x[1]+x[2]})
   aux[aux == 0] <- NA
 
-  # Vectorize all
+  # Get polygons of pine plantation and nf i
   # https://stackoverflow.com/questions/45338384/calculate-the-length-of-shared-boundaries-between-multiple-polygons
   aux_shape <- rasterToPolygons(aux, dissolve = TRUE)
+  # ojo esto y el rasterize pine puede ir fuera del bucle
   aux_shape_pine <- rasterToPolygons(aux, fun=function(x){x == pp_value}, dissolve = TRUE)
-
-  # perimeter pine
   perimeter_pine <- rgeos::gLength(aux_shape_pine)
+
 
   # Which object touch to which
   touching_list <- rgeos::gTouches(aux_shape, byid = TRUE, returnDense=FALSE)
 
-
-  # Loop para ver si el poligono esta compartiendo frontera
+  # Loop para ver si el poligono esta compartiendo limites y cuanto comparten
   if (is.null(touching_list$`1`)) {
 
     l_lines <- 0
@@ -238,7 +237,11 @@ for (i in 1:length(nf_pol)) {
   # plot(lines, add = TRUE, col = 'red', lwd = 2)
 
 # adjacency index (0 - 1)
-  ai <- l_lines/perimeter_pine
+  if (l_lines == 0) {
+    ai <- 1
+  } else {
+    ai <- l_lines / perimeter_pine}
+
 
 
   # Dispersion contribution
