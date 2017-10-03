@@ -26,18 +26,15 @@ source('dist2nf.R', local = TRUE)
 
 
 shinyServer(
-  function(input, output){
-    # --> Run once each time user visits the app
+  function(input, output, session){
 
-    # Tree density (numeric)
     den_pp <- reactive({
       den_pp <- switch(input$density_pp,
                        'baja' = 100,
                        'media' = 1250,
                        'alta' = 3000)
-    })
+      })
 
-    # Colour Tree density
     colour_tree_density <- reactive({
       colour_tree_density <- switch(input$density_pp,
                                     'baja' = '#a1d99b',
@@ -52,42 +49,29 @@ shinyServer(
                            n_nf = input$n_nf)
       })
 
-
     output$medium_bird <- renderUI({
       sliderInput(inputId = "medium_bird",
                   label = "Aves mediano tamaño",
                   min = 0, max = 100 - input$small_bird, value = 0)
       })
 
-    output$restable <- renderTable({
-      myvals<- c(input$small_bird, input$medium_bird, 100-input$small_bird-input$medium_bird)
-      data.frame(Names=c("Aves pequeño tamaño", "Aves mediano tamaño", "Mamíferos"),
+    tableDisp <- reactive({
+      myvals <- c(input$small_bird, input$medium_bird, 100-input$small_bird-input$medium_bird)
+      tabladispersantes <- data.frame(Names=c("Aves pequeño tamaño", "Aves mediano tamaño", "Mamíferos"),
                  Values=myvals)
+      })
+
+    animales <- reactive({
+      myvals <- c(input$small_bird, input$medium_bird, 100-input$small_bird-input$medium_bird)
     })
 
-    output$initial_map <- renderPlot({
 
-      # ## $TODO$$ Como hacer esto?? Es necesario
-      # ## dvector <- rasterToPolygons(d, fun=function(x){x>0}, dissolve = TRUE)
-
-      ## set colours
-      colores <- c('lightgoldenrod1', # Crops
-                   'green', # Natural forests
-                   'white', # Other
-                   colour_tree_density()) # Pine plantation
-
-      ## Legend
-      myKey <- list(text = list(lab = c("crop", "natural forest","other", "pine")),
-                    rectangles=list(col = colores),
-                    space='bottom', columns=4)
-
-      ## plot
-      levelplot(rasterIni(), att='landuse', scales=list(draw=FALSE),
-                col.regions = colores, colorkey=FALSE, key = myKey)
-
+    output$restable <- renderTable({
+      tableDisp()
     })
 
-    output$richness_map <- renderPlot({
+
+    rasterRich <- reactive({
 
       pastUse <- switch(input$pp_pastUse,
                         'Bosque natural' = 'Oak',
@@ -95,7 +79,6 @@ shinyServer(
                         'Pastizal' = 'Pasture',
                         'Cultivo' = 'Crop')
 
-      # Compute distance raster
       dist_raster <- dist2nf(rasterIni(), nf_value = 2)
 
       myr_range <- as.data.frame(
@@ -110,9 +93,35 @@ shinyServer(
                                    pastUse = pastUse,
                                    rescale = FALSE)
 
-      ## Legend
-      # myKey <- list(space='bottom')
-      #plot(mapa_riqueza)
+    })
+
+    rasterDisp <- reactive({
+      v <- disper(x = rasterIni(),
+                  xr = rasterRich(),
+                  nf_value = 2,
+                  pp_value = 1)
+      })
+
+
+    output$initial_map <- renderPlot({
+
+      colores <- c('lightgoldenrod1', # Crops
+                   'green', # Natural forests
+                   'white', # Other
+                   colour_tree_density()) # Pine plantation
+
+      myKey <- list(text = list(lab = c("crop", "natural forest","other", "pine")),
+                    rectangles=list(col = colores),
+                    space='bottom', columns=4)
+
+      levelplot(rasterIni(), att='landuse', scales=list(draw=FALSE),
+                col.regions = colores, colorkey=FALSE, key = myKey)
+
+    })
+
+    output$richness_map <- renderPlot({
+
+      mapa_riqueza <- rasterRich()
 
       mapa_riqueza[mapa_riqueza == 0] <- NA
 
@@ -123,14 +132,46 @@ shinyServer(
                 scales=list(draw=FALSE),
                 colorkey = list(space = "bottom"),
                 pretty=TRUE)
-
-
-
-
-      # myTheme <- BTCTheme()
-      # myTheme$panel.background$col = 'gray'
-
     })
+
+    output$richness_disper <- renderPlot({
+      v <- rasterDisp()
+
+      levelplot(v[['msb']],
+                margin=FALSE,  par.settings = RdBuTheme)
+      })
+
+    output$richness_disperTime <- renderPlot({
+      v <- rasterDisp()
+
+      vectores <- animales()
+      # per_sb <- 0.5 # tableDisp()$myvals[1]
+      per_sb <- vectores[1]
+      # per_mb <- 0.4 # tableDisp()$myvals[2]
+      per_mb <- vectores[2]
+      # per_ma <- 0.1 # tableDisp()$myvals[3]
+      per_ma <- vectores[3]
+
+      # propaguleInputs
+      piB <- (3.7)/10
+      piM <- (0.2)/10
+
+      vv <- disper_time(msb = v[['msb']],
+                        mmb = v[['mmb']],
+                        mma = v[['mma']],
+                        x = rasterIni(),
+                        xr = rasterRich(),
+                        pp_value = 1,
+                        per_sb = per_sb, per_mb = per_mb, per_ma = per_ma,
+                        propaguleInputBird = piB,
+                        propaguleInputMammal = piM,
+                        time_span = 1)
+
+      levelplot(stack(vv),
+                margin=FALSE,  par.settings = RdBuTheme)
+    })
+
+
   }
 
 )
