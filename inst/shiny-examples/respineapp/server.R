@@ -192,15 +192,21 @@ shinyServer(
 
     output$richness_disperTime <- renderPlot({
 
-      i <- 1
+      # valores$doTime == vals$counter
 
-      propagulo_time <- propagule()[['rich_pp']] + (propagule()[['seed_input']])*i
+
+      invalidateLater(millis = 500, session)
+      valores$doTime = isolate(valores$doTime) + 1
+
+      if(valores$doTime < input$timeRange) {
+
+      propagulo_time <- propagule()[['rich_pp']] + (propagule()[['seed_input']])*valores$doTime
 
       rich_time <- calc(stack(landscapeInit(), rasterRich(), propagulo_time),
                         fun = function(x) ifelse(
                           x[1] == pp_value, x[1]*x[3], x[2]))
 
-      names(rich_time) <- paste0('rich_y',i)
+      names(rich_time) <- paste0('rich_y',valores$doTime)
       rich_time[rich_time == 0] <- NA
 
       limite <- rasterToPolygons(landscapeInit(), fun=function(x){x==1}, dissolve = TRUE)
@@ -217,6 +223,36 @@ shinyServer(
                ylim = c(extent(landscapeInit())@ymin,
                         extent(landscapeInit())@ymax),
                colorkey = FALSE, lwd=line_pol)
+      } else {
+
+        propagulo_time <- propagule()[['rich_pp']] + (propagule()[['seed_input']])*input$timeRange
+
+        rich_time <- calc(stack(landscapeInit(), rasterRich(), propagulo_time),
+                          fun = function(x) ifelse(
+                            x[1] == pp_value, x[1]*x[3], x[2]))
+
+        # names(rich_time) <- paste0('rich_y',valores$doTime)
+        rich_time[rich_time == 0] <- NA
+
+        limite <- rasterToPolygons(landscapeInit(), fun=function(x){x==1}, dissolve = TRUE)
+        mytheme <- rasterTheme(region = brewer.pal(9, "YlGn"))
+
+        levelplot(stack(rich_time),
+                  par.settings = mytheme, margin = FALSE,
+                  scales=list(draw=FALSE),
+                  colorkey = list(space = "bottom"),
+                  pretty=TRUE) +
+          spplot(limite, fill = "transparent", col = "black",
+                 xlim = c(extent(landscapeInit())@xmin,
+                          extent(landscapeInit())@xmax),
+                 ylim = c(extent(landscapeInit())@ymin,
+                          extent(landscapeInit())@ymax),
+                 colorkey = FALSE, lwd=line_pol)
+
+
+
+
+        }
     })
 
 
