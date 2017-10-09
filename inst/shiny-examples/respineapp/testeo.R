@@ -68,11 +68,14 @@ levelplot(myl, att='landuse', scales=list(draw=FALSE),
 ### 4 ### VALORES RIQUEZA INICIALES
 # nf_value <- 2
 #
-# nf_edges <- rasterToPolygons(myl, fun=function(x){x==nf_value}, dissolve = TRUE)
-#
-# levelplot(myl, att='landuse', scales=list(draw=FALSE),
-#           col.regions = colores, colorkey=FALSE, key = myKey) +
-#   layer(sp.polygons(nf_edges, fill=NA))
+pp_value <- 1
+pine_limit <- rasterToPolygons(myl, fun=function(x){x==pp_value}, dissolve = TRUE)
+
+
+
+levelplot(myl, att='landuse', scales=list(draw=FALSE),
+          col.regions = colores, colorkey=FALSE, key = myKey) +
+  layer(sp.polygons(pine_limit, fill=NA))
 
 
 myr_range <- as.data.frame(
@@ -148,6 +151,11 @@ vv <- disper_time(msb = v[['msb']],
                   propaguleInputBird = piB,
                   propaguleInputMammal = piM,
                   time_span = 10)
+
+
+
+# crs(vv) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+#writeRaster(vv, '/Users/ajpelu/Desktop/stackTEST/out.tif', bylayer=TRUE)
 
 msb = v[['msb']]
 mmb = v[['mmb']]
