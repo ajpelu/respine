@@ -35,7 +35,7 @@ navbarPage("Respine App", id = "navbar", theme = shinytheme("simplex"),
         sliderInput(inputId = "small_bird",label = "Aves pequeño tamaño",
                     min = 0, max = 100, value = 0, step = 1),
         uiOutput("medium_bird"),
-        tableOutput("restable"),
+        tableOutput("disptable"),
         sliderInput("timeRange", "Número de años:", min=10, max=50, value=30),
         actionButton("doRiqueza", "Calcula Riqueza")
         ),

@@ -95,13 +95,12 @@ shinyServer(
                  Mammals = 100-(input$small_bird+input$medium_bird))
     })
 
-    animales <- reactive({
-      myvals <- c(input$small_bird, input$medium_bird, 100-input$small_bird-input$medium_bird)
-    })
+    # animales <- reactive({
+    #   myvals <- c(input$small_bird, input$medium_bird, 100-input$small_bird-input$medium_bird)
+    # })
 
-    output$restable <- renderTable({
-      disp()
-    })
+    output$disptable <- renderTable({
+      disp()}, hover = TRUE, spacing = 'xs', align = 'c', digits = 0)
 
     rasterRich <- reactive({
 
@@ -123,7 +122,6 @@ shinyServer(
 
     propagule <- reactive({
       v <- rasterDisp()
-      perdisp <- animales()
 
       x = landscapeInit()
       xr = rasterRich()
@@ -132,10 +130,6 @@ shinyServer(
       mmb = v[['mmb']]
       mma = v[['mma']]
 
-      # per_sb = perdisp[1]
-      per_sb = disp()$SmallBirds
-      per_mb = perdisp[2]
-      per_ma = perdisp[3]
 
       propaguleInputBird = (3.7)/10
       propaguleInputMammal = (0.2)/10
@@ -145,7 +139,7 @@ shinyServer(
       names(rich_pp) <- 'rich_pp'
 
       # Compute propagule input by cell
-      seed_input <- ((msb * per_sb) + (mmb * per_mb)) * propaguleInputBird  + (mma * per_ma) * propaguleInputMammal
+      seed_input <- ((msb * disp()$SmallBirds) + (mmb * disp()$MediumBirds)) * propaguleInputBird  + (mma * disp()$Mammals) * propaguleInputMammal
       names(seed_input) <- 'seed_input'
 
       propagule_stack <- stack(rich_pp, seed_input)
