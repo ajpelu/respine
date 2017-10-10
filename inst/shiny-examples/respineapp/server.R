@@ -35,6 +35,10 @@ line_pol <- 2 ### Line width polygon
 pp_value <- 1 ### Value for Pine plantation
 nf_value <- 2 ### Value for Natural forest
 
+# Richness range
+ri_range <- as.data.frame(cbind(value = c(0,1,2,3),
+                                 lowRich = c(0, 12.82, mean(13.72, 15.62), 1),
+                                 upRich = c(0, 13.34, mean(16.11, 19.66), 2)))
 
 ### -------------------------------
 # SERVER
@@ -51,7 +55,6 @@ shinyServer(
       # 1+ will be coerced to TRUE
       valores$doPlot <- input$doPaisaje
       })
-
 
 
     ### ----------------------------------------------
@@ -93,17 +96,15 @@ shinyServer(
 
 
     ### ----------------------------------------------
+    ## Distance raster
+    dist_raster <- reactive({
+      dist2nf(landscapeInit(), nf_value = nf_value)
+      })
+
     ## Compute initial Richnness
     rasterRich <- reactive({
-
-      dist_raster <- dist2nf(landscapeInit(), nf_value = nf_value)
-
-      myr_range <- as.data.frame( cbind(value = c(0,1,2,3),
-              lowRich = c(0, 12.82, mean(13.72, 15.62), 1),
-              upRich = c(0, 13.34, mean(16.11, 19.66), 2)))
-
-      mapa_riqueza <- initRichness(r = landscapeInit(), draster = dist_raster,
-                                   r_range = myr_range, treedensity = den_pp()$den,
+      mapa_riqueza <- initRichness(r = landscapeInit(), draster = dist_raster(),
+                                   r_range = ri_range, treedensity = den_pp()$den,
                                    pastUse = pastUse(), rescale = FALSE)
     })
 
