@@ -103,10 +103,25 @@ shinyServer(
 
     ## Compute initial Richnness
     rasterRich <- reactive({
-      mapa_riqueza <- initRichness(r = landscapeInit(), draster = dist_raster(),
-                                   r_range = ri_range, treedensity = den_pp()$den,
-                                   pastUse = pastUse(), rescale = FALSE)
+      initRichness(r = landscapeInit(), draster = dist_raster(),
+                   r_range = ri_range, treedensity = den_pp()$den,
+                   pastUse = pastUse(), rescale = FALSE)
     })
+
+    ## Get bouondary of pp
+    limit_pp <- reactive({
+      rasterToPolygons(landscapeInit(), fun=function(x){x==pp_value}, dissolve = TRUE)
+    })
+
+    ## extension of Landscape Init
+    ext <- reactive({
+      list(
+        xmin = extent(landscapeInit())@xmin,
+        xmax = extent(landscapeInit())@xmax,
+        ymin = extent(landscapeInit())@ymin,
+        ymax = extent(landscapeInit())@ymax)
+    })
+
 
     rasterDisp <- reactive({
       v <- disper(x = landscapeInit(), xr = rasterRich(), nf_value = nf_value, pp_value = pp_value)
@@ -154,13 +169,12 @@ shinyServer(
                       rectangles=list(col = colores), space='bottom', columns=4)
 
 
-        limite <- rasterToPolygons(landscapeInit(), fun=function(x){x==1}, dissolve = TRUE)
+        # limite <- rasterToPolygons(landscapeInit(), fun=function(x){x==1}, dissolve = TRUE)
 
         levelplot(landscapeInit(), att='landuse', scales=list(draw=FALSE),
                   col.regions = colores, colorkey=FALSE, key = myKey) +
-          spplot(limite, fill = "transparent", col = "black",
-                 xlim = c(extent(landscapeInit())@xmin, extent(landscapeInit())@xmax),
-                 ylim = c(extent(landscapeInit())@ymin, extent(landscapeInit())@ymax),
+          spplot(limit_pp(), fill = "transparent", col = "black",
+                 xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
                  colorkey = FALSE, lwd=line_pol)
 
         })
