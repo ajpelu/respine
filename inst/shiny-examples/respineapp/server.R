@@ -33,6 +33,7 @@ r[] <- 0
 ## Some parameters
 line_pol <- 2 ### Line width polygon
 pp_value <- 1 ### Value for Pine plantation
+nf_value <- 2 ### Value for Natural forest
 
 
 ### -------------------------------
@@ -95,7 +96,7 @@ shinyServer(
     ## Compute initial Richnness
     rasterRich <- reactive({
 
-      dist_raster <- dist2nf(landscapeInit(), nf_value = 2)
+      dist_raster <- dist2nf(landscapeInit(), nf_value = nf_value)
 
       myr_range <- as.data.frame( cbind(value = c(0,1,2,3),
               lowRich = c(0, 12.82, mean(13.72, 15.62), 1),
@@ -107,7 +108,7 @@ shinyServer(
     })
 
     rasterDisp <- reactive({
-      v <- disper(x = landscapeInit(), xr = rasterRich(), nf_value = 2, pp_value = pp_value)
+      v <- disper(x = landscapeInit(), xr = rasterRich(), nf_value = nf_value, pp_value = pp_value)
       })
 
 
