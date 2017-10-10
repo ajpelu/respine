@@ -54,42 +54,57 @@ shinyServer(
 
 
     ### --------------------------
-    den_pp <- reactive({
-      den_pp <- switch(input$density_pp, 'baja' = 100, 'media' = 1250, 'alta' = 3000)
+    # Density
+    den_pp <- reactive ({
+      list(
+        den = switch(input$density_pp, 'baja' = 100, 'media' = 1250, 'alta' = 3000),
+        col = switch(input$density_pp,'baja' = '#a1d99b', 'media' = '#238b45','alta' = '#00441b'))
       })
 
-    colour_tree_density <- reactive({
-      colour_tree_density <- switch(input$density_pp,
-                                    'baja' = '#a1d99b', 'media' = '#238b45','alta' = '#00441b')
-      })
-
+    # Create landscape
     landscapeInit <- reactive({
-      d <- createLandscape(r, size_pp = input$size_pp, size_nf = input$size_nf, n_nf = input$n_nf)
+      createLandscape(r, size_pp = input$size_pp, size_nf = input$size_nf, n_nf = input$n_nf)
       })
 
+    # Past Use
+    pastUse <- reactive({
+      switch(input$pp_pastUse, 'Bosque natural' = 'Oak', 'Matorral' = 'Shrubland',
+             'Pastizal' = 'Pasture','Cultivo' = 'Crop')
+      })
+
+    ### ----------------------------------------------
+    # Dispersion table
+    ## slider conditioned to small_bird slider (see ui.R)
     output$medium_bird <- renderUI({
       sliderInput(inputId = "medium_bird",
                   label = "Aves mediano tamaño",
                   min = 0, max = 100 - input$small_bird, value = 0)
       })
 
-    tableDisp <- reactive({
-      myvals <- c(input$small_bird, input$medium_bird, 100-input$small_bird-input$medium_bird)
-      tabladispersantes <- data.frame(Dispersor=c("Small birds", "Meidum Birds", "Mammals"),
-                 Porcentaje=myvals)
-      })
+    # disp <- reactive({
+    # # tableDisp <- reactive({
+    # # myvals <- c(input$small_bird, input$medium_bird, 100-input$small_bird-input$medium_bird)
+    #   data.frame(
+    #     Dispersor=c("Small birds", "Meidum Birds", "Mammals"),
+    #              Porcentaje=c(input$small_bird, input$medium_bird, 100-input$small_bird-input$medium_bird))
+    #   })
+    #
+    disp <- reactive({
+      data.frame(SmallBirds = input$small_bird,
+                 MediumBirds = input$medium_bird,
+                 Mammals = 100-(input$small_bird+input$medium_bird))
+    })
 
     animales <- reactive({
       myvals <- c(input$small_bird, input$medium_bird, 100-input$small_bird-input$medium_bird)
     })
 
     output$restable <- renderTable({
-      tableDisp()
+      disp()
     })
 
     rasterRich <- reactive({
-      pastUse <- switch(input$pp_pastUse, 'Bosque natural' = 'Oak', 'Matorral' = 'Shrubland',
-                        'Pastizal' = 'Pasture','Cultivo' = 'Crop')
+
       dist_raster <- dist2nf(landscapeInit(), nf_value = 2)
 
       myr_range <- as.data.frame( cbind(value = c(0,1,2,3),
@@ -97,8 +112,8 @@ shinyServer(
               upRich = c(0, 13.34, mean(16.11, 19.66), 2)))
 
       mapa_riqueza <- initRichness(r = landscapeInit(), draster = dist_raster,
-                                   r_range = myr_range, treedensity = den_pp(),
-                                   pastUse = pastUse, rescale = FALSE)
+                                   r_range = myr_range, treedensity = den_pp()$den,
+                                   pastUse = pastUse(), rescale = FALSE)
     })
 
     rasterDisp <- reactive({
@@ -117,7 +132,8 @@ shinyServer(
       mmb = v[['mmb']]
       mma = v[['mma']]
 
-      per_sb = perdisp[1]
+      # per_sb = perdisp[1]
+      per_sb = disp()$SmallBirds
       per_mb = perdisp[2]
       per_ma = perdisp[3]
 
@@ -146,7 +162,7 @@ shinyServer(
         colores <- c('lightgoldenrod1', # Crops
                      'green', # Natural forests
                      'white', # Other
-                     colour_tree_density()) # Pine plantation
+                     den_pp()$col) # Pine plantation
         myKey <- list(text = list(lab = c("Cultivos", "Bosques Naturales","Matorrales", "Pinares")),
                       rectangles=list(col = colores), space='bottom', columns=4)
 
