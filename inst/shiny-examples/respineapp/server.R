@@ -46,14 +46,14 @@ shinyServer(
   function(input, output, session){
 
     valores <- reactiveValues(
-      doPlot = 0,
+      doPlotInitialMap = 0,
       doRiqueza = 0,
       doTime = 1)
 
     observeEvent(input$doPaisaje, {
       # 0 will be coerced to FALSE
       # 1+ will be coerced to TRUE
-      valores$doPlot <- input$doPaisaje
+      valores$doPlotInitialMap <- input$doPaisaje
       })
 
 
@@ -157,9 +157,7 @@ shinyServer(
 
 
     output$initial_map <- renderPlot({
-
-      if (valores$doPlot == FALSE) return()
-
+      if (valores$doPlotInitialMap == 0) return()
       isolate({
         colores <- c('lightgoldenrod1', # Crops
                      'green', # Natural forests
@@ -168,17 +166,16 @@ shinyServer(
         myKey <- list(text = list(lab = c("Cultivos", "Bosques Naturales","Matorrales", "Pinares")),
                       rectangles=list(col = colores), space='bottom', columns=4)
 
-
-        # limite <- rasterToPolygons(landscapeInit(), fun=function(x){x==1}, dissolve = TRUE)
-
         levelplot(landscapeInit(), att='landuse', scales=list(draw=FALSE),
                   col.regions = colores, colorkey=FALSE, key = myKey) +
           spplot(limit_pp(), fill = "transparent", col = "black",
                  xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
                  colorkey = FALSE, lwd=line_pol)
-
         })
       })
+
+
+
 
     output$richness_map <- renderPlot({
       if (valores$doPlot == FALSE) return()
