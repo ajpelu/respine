@@ -53,7 +53,7 @@ shinyServer(
 
 
 
-    ### --------------------------
+    ### ----------------------------------------------
     # Density
     den_pp <- reactive ({
       list(
@@ -75,33 +75,24 @@ shinyServer(
     ### ----------------------------------------------
     # Dispersion table
     ## slider conditioned to small_bird slider (see ui.R)
-    output$medium_bird <- renderUI({
-      sliderInput(inputId = "medium_bird",
+    output$mb <- renderUI({
+      sliderInput(inputId = "mb",
                   label = "Aves mediano tamaño",
-                  min = 0, max = 100 - input$small_bird, value = 0)
+                  min = 0, max = 100 - input$sb, value = 0)
       })
 
-    # disp <- reactive({
-    # # tableDisp <- reactive({
-    # # myvals <- c(input$small_bird, input$medium_bird, 100-input$small_bird-input$medium_bird)
-    #   data.frame(
-    #     Dispersor=c("Small birds", "Meidum Birds", "Mammals"),
-    #              Porcentaje=c(input$small_bird, input$medium_bird, 100-input$small_bird-input$medium_bird))
-    #   })
-    #
     disp <- reactive({
-      data.frame(SmallBirds = input$small_bird,
-                 MediumBirds = input$medium_bird,
-                 Mammals = 100-(input$small_bird+input$medium_bird))
+      data.frame(SmallBirds = input$sb,
+                 MediumBirds = input$mb,
+                 Mammals = 100-(input$sb + input$mb))
     })
-
-    # animales <- reactive({
-    #   myvals <- c(input$small_bird, input$medium_bird, 100-input$small_bird-input$medium_bird)
-    # })
 
     output$disptable <- renderTable({
       disp()}, hover = TRUE, spacing = 'xs', align = 'c', digits = 0)
 
+
+    ### ----------------------------------------------
+    ## Compute initial Richnness
     rasterRich <- reactive({
 
       dist_raster <- dist2nf(landscapeInit(), nf_value = 2)
