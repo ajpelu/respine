@@ -1,5 +1,6 @@
 library('shiny')
 library('shinythemes')
+library('shinycssloaders')
 library('shinydashboard')
 library('knitr')
 library('markdown')
@@ -43,11 +44,17 @@ navbarPage("Respine App", id = "navbar", theme = shinytheme("simplex"),
       mainPanel(
         tabsetPanel(
           tabPanel("Paisaje Inicial", value = 'panel2',
-                   plotOutput(outputId = 'initial_map')),
+                   withSpinner(
+                     plotOutput(outputId = 'initial_map'),
+                     type=5, size=.8)),
           tabPanel("Mapa de Riqueza Inicial", value = 'panel3',
-                   plotOutput(outputId = 'richness_map')),
+                   withSpinner(
+                     plotOutput(outputId = 'richness_map'),
+                     type=5, size = .8)),
           tabPanel("Input Propágulos", value = 'panel4',
-                   plotOutput(outputId = 'richness_disper')),
+                   withSpinner(
+                     plotOutput(outputId = 'richness_disper'),
+                     type=5, size = .8)),
           tabPanel("Mapa de Riqueza Tiempo", value = 'panel5',
                    plotOutput(outputId = 'richness_disperTime'))
           )))))
