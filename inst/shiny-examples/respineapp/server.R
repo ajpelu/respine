@@ -36,9 +36,17 @@ pp_value <- 1 ### Value for Pine plantation
 nf_value <- 2 ### Value for Natural forest
 
 # Richness range
-ri_range <- as.data.frame(cbind(value = c(0,1,2,3),
-                                 lowRich = c(0, 12.82, mean(13.72, 15.62), 1),
-                                 upRich = c(0, 13.34, mean(16.11, 19.66), 2)))
+ri_range <- as.data.frame(
+  cbind(value = c(0,1,2,3),
+        lowRich = c(0, 12.82, mean(13.72, 15.62), 1),
+        upRich = c(0, 13.34, mean(16.11, 19.66), 2)))
+
+# Input year/m2
+piBird = (3.7)/10
+piMammal = (0.2)/10
+
+# Themes for raster richness
+richness_theme <- rasterTheme(region = brewer.pal(9, "YlGn"))
 
 ### -------------------------------
 # SERVER
@@ -86,13 +94,17 @@ shinyServer(
       })
 
     disp <- reactive({
-      disp <- cbind(SmallBirds = input$sb,
-                    MediumBirds = input$mb,
-                    Mammals = (100-(input$sb + input$mb)))
+      list(persb = input$sb,
+           permb = input$mb,
+           perma = (100-(input$sb + input$mb)))
     })
 
     output$disptable <- renderTable({
-      disp()}, hover = TRUE, spacing = 'xs', align = 'c', digits = 0)
+      tabla <- cbind(SmallBirds = disp()$persb,
+                     MediumBirds = disp()$permb,
+                     Mammals = disp()$perma)
+      tabla},
+      hover = TRUE, spacing = 'xs', align = 'c', digits = 0)
 
 
     ### ----------------------------------------------
@@ -122,40 +134,27 @@ shinyServer(
         ymax = extent(landscapeInit())@ymax)
     })
 
-
+    ### ----------------------------------------------
+    ## Compute dispersion rasters
     rasterDisp <- reactive({
-      v <- disper(x = landscapeInit(), xr = rasterRich(), nf_value = nf_value, pp_value = pp_value)
+      disper(x = landscapeInit(), xr = rasterRich(), nf_value = nf_value, pp_value = pp_value)
       })
 
+    ## Compute Richness pine plantations
+    rich_pp <- reactive({
+     calc(stack(landscapeInit(), rasterRich()), fun=function(x) ifelse(x[1] == pp_value, x[1]*x[2], NA))
+    })
 
+    ## Input propagule
     propagule <- reactive({
-      v <- rasterDisp()
-
-      x = landscapeInit()
-      xr = rasterRich()
-
-      msb = v[['msb']]
-      mmb = v[['mmb']]
-      mma = v[['mma']]
-
-
-      propaguleInputBird = (3.7)/10
-      propaguleInputMammal = (0.2)/10
-
-      # Get richnes of pine plantations
-      rich_pp <- calc(stack(landscapeInit(), rasterRich()), fun=function(x) ifelse(x[1] == pp_value, x[1]*x[2], NA))
-      names(rich_pp) <- 'rich_pp'
-
       # Compute propagule input by cell
-      seed_input <- ((msb * disp()$SmallBirds) + (mmb * disp()$MediumBirds)) * propaguleInputBird  + (mma * disp()$Mammals) * propaguleInputMammal
-      names(seed_input) <- 'seed_input'
-
-      propagule_stack <- stack(rich_pp, seed_input)
+      piBird * ((rasterDisp()[['msb']] * disp()$persb) + (rasterDisp()[['mmb']] * disp()$permb)) + (rasterDisp()[['mma']] * disp()$perma) * piMammal
     })
 
 
-
-
+    ### ----------------------------------------------
+    # Endpoints
+    ## Initial Map
     output$initial_map <- renderPlot({
       if (valores$doPlotInitialMap == 0) return()
       isolate({
@@ -174,32 +173,25 @@ shinyServer(
         })
       })
 
-
-
-
+    ## Richness Map (initial)
     output$richness_map <- renderPlot({
-      if (valores$doPlot == FALSE) return()
+      if (valores$doPlotInitialMap == FALSE) return()
       isolate({
-      mapa_riqueza <- rasterRich()
-      mapa_riqueza[mapa_riqueza == 0] <- NA
-      mytheme <- rasterTheme(region = brewer.pal(9, "YlGn"))
-      limite <- rasterToPolygons(landscapeInit(), fun=function(x){x==1}, dissolve = TRUE)
-      levelplot(mapa_riqueza,
-                par.settings = mytheme, margin = FALSE,
-                scales=list(draw=FALSE),
-                colorkey = list(space = "bottom"),
-                pretty=TRUE) +
-        spplot(limite, fill = "transparent", col = "black",
-               xlim = c(extent(landscapeInit())@xmin, extent(landscapeInit())@xmax),
-               ylim = c(extent(landscapeInit())@ymin, extent(landscapeInit())@ymax),
-               colorkey = FALSE, lwd = line_pol)
+        mapa_riqueza <- rasterRich()
+        mapa_riqueza[mapa_riqueza == 0] <- NA
+
+        levelplot(mapa_riqueza, par.settings = richness_theme, margin = FALSE,
+                scales=list(draw=FALSE), pretty=TRUE,
+                colorkey = list(space = "bottom")) +
+        spplot(limit_pp(), fill = "transparent", col = "black",
+               xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
+               colorkey = FALSE, lwd=line_pol)
       })
     })
 
     output$richness_disper <- renderPlot({
 
-      v <- rasterDisp()
-      levelplot(v[['msb']],
+      levelplot(propagule(),
                 margin=FALSE,  par.settings = RdBuTheme)
       })
 
