@@ -43,8 +43,8 @@ ri_range <- as.data.frame(
         upRich = c(0, 13.34, mean(16.11, 19.66), 2)))
 
 # Input year/m2
-piBird = (3.7)/100
-piMammal = (0.2)/100
+piBird = (3.7)/50
+piMammal = (0.2)/50
 
 # Themes for raster richness
 richness_theme <- rasterTheme(region = brewer.pal(9, "YlGn"))
@@ -57,7 +57,7 @@ shinyServer(
     valores <- reactiveValues(
       doPlotInitialMap = 0,
       doRiqueza = 0,
-      doTime = 1)
+      doTime = 0)
 
     observeEvent(input$doPaisaje, {
       # 0 will be coerced to FALSE
@@ -192,78 +192,147 @@ shinyServer(
 
     ## Propagule Input
     output$richness_disper <- renderPlot({
-
       levelplot(propagule(),
                 margin=FALSE,  par.settings = RdBuTheme)
-      })
+    })
 
-
+    ## Evolution time dispersion
 
     output$richness_disperTime <- renderPlot({
 
-      # valores$doTime == vals$counter
-
-
-      invalidateLater(millis = 500, session)
-      valores$doTime = isolate(valores$doTime) + 1
-
-      if(valores$doTime < input$timeRange) {
-
-      propagulo_time <- propagule()[['rich_pp']] + (propagule()[['seed_input']])*valores$doTime
+      propagulo_time <- rich_pp() + propagule()*input$timeRange
 
       rich_time <- calc(stack(landscapeInit(), rasterRich(), propagulo_time),
-                        fun = function(x) ifelse(
-                          x[1] == pp_value, x[1]*x[3], x[2]))
-
-      names(rich_time) <- paste0('rich_y',valores$doTime)
-      rich_time[rich_time == 0] <- NA
-
-      limite <- rasterToPolygons(landscapeInit(), fun=function(x){x==1}, dissolve = TRUE)
-      mytheme <- rasterTheme(region = brewer.pal(9, "YlGn"))
+                        fun = function(x) ifelse(x[1] == pp_value, x[1]*x[3], x[2]))
+      rich_time[rich_time== 0] <- NA
 
       levelplot(stack(rich_time),
-                par.settings = mytheme, margin = FALSE,
-                scales=list(draw=FALSE),
-                colorkey = list(space = "bottom"),
-                pretty=TRUE) +
-        spplot(limite, fill = "transparent", col = "black",
-               xlim = c(extent(landscapeInit())@xmin,
-                        extent(landscapeInit())@xmax),
-               ylim = c(extent(landscapeInit())@ymin,
-                        extent(landscapeInit())@ymax),
+                par.settings = richness_theme, margin = FALSE, pretty=TRUE,
+                scales=list(draw=FALSE), colorkey = list(space = "bottom")) +
+        spplot(limit_pp(), fill = "transparent", col = "black",
+               xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
                colorkey = FALSE, lwd=line_pol)
-      } else {
 
-        propagulo_time <- propagule()[['rich_pp']] + (propagule()[['seed_input']])*input$timeRange
-
-        rich_time <- calc(stack(landscapeInit(), rasterRich(), propagulo_time),
-                          fun = function(x) ifelse(
-                            x[1] == pp_value, x[1]*x[3], x[2]))
-
-        # names(rich_time) <- paste0('rich_y',valores$doTime)
-        rich_time[rich_time == 0] <- NA
-
-        limite <- rasterToPolygons(landscapeInit(), fun=function(x){x==1}, dissolve = TRUE)
-        mytheme <- rasterTheme(region = brewer.pal(9, "YlGn"))
-
-        levelplot(stack(rich_time),
-                  par.settings = mytheme, margin = FALSE,
-                  scales=list(draw=FALSE),
-                  colorkey = list(space = "bottom"),
-                  pretty=TRUE) +
-          spplot(limite, fill = "transparent", col = "black",
-                 xlim = c(extent(landscapeInit())@xmin,
-                          extent(landscapeInit())@xmax),
-                 ylim = c(extent(landscapeInit())@ymin,
-                          extent(landscapeInit())@ymax),
-                 colorkey = FALSE, lwd=line_pol)
-
-
-
-
-        }
     })
 
+
+
+
+      # invalidateLater(millis = 1000, session)
+      # valores$doTime = isolate(valores$doTime) + 1
+      #
+      #
+      # if(valores$doTime < input$timeRange){
+      #   propagulo_time <- rich_pp() + propagule()*valores$doTime
+      #
+      #   rich_time <- calc(stack(landscapeInit(), rasterRich(), propagulo_time),
+      #                     fun = function(x) ifelse(x[1] == pp_value, x[1]*x[3], x[2]))
+      #   rich_time[rich_time== 0] <- NA
+      #
+      #   levelplot(stack(rich_time),
+      #             par.settings = richness_theme, margin = FALSE, pretty=TRUE,
+      #             scales=list(draw=FALSE), colorkey = list(space = "bottom")) +
+      #     spplot(limit_pp(), fill = "transparent", col = "black",
+      #            xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
+      #            colorkey = FALSE, lwd=line_pol)
+      # } else {
+      #   propagulo_time <- rich_pp() + propagule()*input$timeRange
+      #
+      #   rich_time <- calc(stack(landscapeInit(), rasterRich(), propagulo_time),
+      #                     fun = function(x) ifelse(x[1] == pp_value, x[1]*x[3], x[2]))
+      #   rich_time[rich_time== 0] <- NA
+      #
+      #   levelplot(stack(rich_time),
+      #             par.settings = richness_theme, margin = FALSE, pretty=TRUE,
+      #             scales=list(draw=FALSE), colorkey = list(space = "bottom")) +
+      #     spplot(limit_pp(), fill = "transparent", col = "black",
+      #            xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
+      #            colorkey = FALSE, lwd=line_pol)
+      # }
+
+
+
+      # for (i in 1:input$timeRange){
+      #
+      #   propagulo_time <- rich_pp() + propagule()*i
+      #
+      #   rich_time <- calc(stack(landscapeInit(), rasterRich(), propagulo_time),
+      #                     fun = function(x) ifelse(
+      #                       x[1] == pp_value, x[1]*x[3], x[2]))
+      #
+      #   levelplot(stack(rich_time),
+      #             par.settings = richness_theme, margin = FALSE, pretty=TRUE,
+      #             scales=list(draw=FALSE), colorkey = list(space = "bottom")) +
+      #     spplot(limit_pp(), fill = "transparent", col = "black",
+      #            xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
+      #            colorkey = FALSE, lwd=line_pol)
+      #
+      # }
+
+      # # valores$doTime == vals$counter
+      # invalidateLater(millis = 500, session)
+      # valores$doTime = isolate(valores$doTime) + 1
+      #
+      #
+      #
+      #
+      #
+      #
+      # if(valores$doTime < input$timeRange) {
+
+      #   propagulo_time <- rich_pp() + propagule()*valores$doTime
+      #
+      # # propagulo_time <- propagule()[['rich_pp']] + (propagule()[['seed_input']])*valores$doTime
+      #
+      #   rich_time <- calc(stack(landscapeInit(), rasterRich(), propagulo_time),
+      #                   fun = function(x) ifelse(
+      #                     x[1] == pp_value, x[1]*x[3], x[2]))
+
+      # names(rich_time) <- paste0('rich_y',valores$doTime)
+      # rich_time[rich_time == 0] <- NA
+
+      # limite <- rasterToPolygons(landscapeInit(), fun=function(x){x==1}, dissolve = TRUE)
+      # mytheme <- rasterTheme(region = brewer.pal(9, "YlGn"))
+
+      # levelplot(stack(rich_time),
+      #           par.settings = richness_theme, margin = FALSE, pretty=TRUE,
+      #           scales=list(draw=FALSE), colorkey = list(space = "bottom")) +
+      #     spplot(limit_pp(), fill = "transparent", col = "black",
+      #            xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
+      #            colorkey = FALSE, lwd=line_pol)
+
+
+
+      # } else {
+      #
+      #   propagulo_time <- rich_pp() + propagule()*valores$doTime*input$timeRange
+      #
+      #   rich_time <- calc(stack(landscapeInit(), rasterRich(), propagulo_time),
+      #                     fun = function(x) ifelse(
+      #                       x[1] == pp_value, x[1]*x[3], x[2]))
+      #
+      #   # names(rich_time) <- paste0('rich_y',valores$doTime)
+      #   rich_time[rich_time == 0] <- NA
+      #
+      #   limite <- rasterToPolygons(landscapeInit(), fun=function(x){x==1}, dissolve = TRUE)
+      #   mytheme <- rasterTheme(region = brewer.pal(9, "YlGn"))
+      #
+      #   levelplot(stack(rich_time),
+      #             par.settings = mytheme, margin = FALSE,
+      #             scales=list(draw=FALSE),
+      #             colorkey = list(space = "bottom"),
+      #             pretty=TRUE) +
+      #     spplot(limite, fill = "transparent", col = "black",
+      #            xlim = c(extent(landscapeInit())@xmin,
+      #                     extent(landscapeInit())@xmax),
+      #            ylim = c(extent(landscapeInit())@ymin,
+      #                     extent(landscapeInit())@ymax),
+      #            colorkey = FALSE, lwd=line_pol)
+      #
+      #
+      #
+      #
+      #   }
 
   }
 
