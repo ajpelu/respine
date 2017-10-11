@@ -1,4 +1,5 @@
 library('shiny')
+library('shinycssloaders')
 library('raster')
 library('landscapeR')
 library('rasterVis')
@@ -42,8 +43,8 @@ ri_range <- as.data.frame(
         upRich = c(0, 13.34, mean(16.11, 19.66), 2)))
 
 # Input year/m2
-piBird = (3.7)/10
-piMammal = (0.2)/10
+piBird = (3.7)/100
+piMammal = (0.2)/100
 
 # Themes for raster richness
 richness_theme <- rasterTheme(region = brewer.pal(9, "YlGn"))
@@ -162,11 +163,11 @@ shinyServer(
                      'green', # Natural forests
                      'white', # Other
                      den_pp()$col) # Pine plantation
-        myKey <- list(text = list(lab = c("Cultivos", "Bosques Naturales","Matorrales", "Pinares")),
+        key_landuses <- list(text = list(lab = c("Cultivos", "Bosques Naturales","Matorrales", "Pinares")),
                       rectangles=list(col = colores), space='bottom', columns=4)
 
         levelplot(landscapeInit(), att='landuse', scales=list(draw=FALSE),
-                  col.regions = colores, colorkey=FALSE, key = myKey) +
+                  col.regions = colores, colorkey=FALSE, key = key_landuses) +
           spplot(limit_pp(), fill = "transparent", col = "black",
                  xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
                  colorkey = FALSE, lwd=line_pol)
@@ -189,11 +190,13 @@ shinyServer(
       })
     })
 
+    ## Propagule Input
     output$richness_disper <- renderPlot({
 
       levelplot(propagule(),
                 margin=FALSE,  par.settings = RdBuTheme)
       })
+
 
 
     output$richness_disperTime <- renderPlot({
