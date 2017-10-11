@@ -56,7 +56,9 @@ navbarPage("Respine App", id = "navbar", theme = shinytheme("simplex"),
                      plotOutput(outputId = 'richness_disper'),
                      type=5, size = .8)),
           tabPanel("Mapa de Riqueza Tiempo", value = 'panel5',
-                   plotOutput(outputId = 'richness_disperTime'))
+                   withSpinner(
+                     plotOutput(outputId = 'richness_disperTime'),
+                     type=5, size = .8))
           )))))
 
 
