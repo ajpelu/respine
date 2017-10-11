@@ -86,9 +86,9 @@ shinyServer(
       })
 
     disp <- reactive({
-      data.frame(SmallBirds = input$sb,
-                 MediumBirds = input$mb,
-                 Mammals = 100-(input$sb + input$mb))
+      disp <- cbind(SmallBirds = input$sb,
+                    MediumBirds = input$mb,
+                    Mammals = (100-(input$sb + input$mb)))
     })
 
     output$disptable <- renderTable({
