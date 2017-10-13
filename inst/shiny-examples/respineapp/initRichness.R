@@ -77,9 +77,8 @@ initRichness <- function(r, draster, r_range, treedensity, pastUse, rescale=TRUE
   ## Combine factor to correct pine plantations
   f_pine <- (sh_scaled*0.35) + (.45*ftreeden + .2*fplu)
 
-
   r[r == -100]  <- sample(potR_pp, ncell_pp, replace = TRUE)
-  r <- calc(stack(r, f_pine), fun = function(x) ifelse(x[1] < -100, x[1], x[1]*f_pine))
+  r <- calc(stack(r, f_pine), fun = function(x) ifelse(x[1] < -100, x[1], x[1]*x[2]))
 
   # --- Crops
   r[r == -300]  <- sample(potR_crop, ncell_crop, replace = TRUE)
