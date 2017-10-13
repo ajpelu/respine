@@ -135,6 +135,11 @@ shinyServer(
         ymax = extent(landscapeInit())@ymax)
     })
 
+
+
+
+
+
     ### ----------------------------------------------
     ## Compute dispersion rasters
     rasterDisp <- reactive({
@@ -151,6 +156,26 @@ shinyServer(
       # Compute propagule input by cell
       piBird * ((rasterDisp()[['msb']] * disp()$persb) + (rasterDisp()[['mmb']] * disp()$permb)) + (rasterDisp()[['mma']] * disp()$perma) * piMammal
     })
+
+
+    ## Richness statistics
+    rich_nf <- reactive({
+      rich_nf <- calc(stack(landscapeInit(), rasterRich()), fun=function(x) ifelse(x[1] == nf_value, (x[1]/nf_value)*x[2], NA))
+      })
+
+
+    output$rich_table_init <- renderTable({
+      tabla <- cbind(
+        Ecosistema = c("Repoblación de Pinar", "Bosques naturales"),
+        Media = c(round(cellStats(rich_pp(), mean),2),
+                  round(cellStats(rich_nf(), mean),2)),
+        Min = c(round(cellStats(rich_pp(), min), 2),
+                round(cellStats(rich_nf(), min),2)),
+        Max = c(round(cellStats(rich_pp(), max),2),
+                round(cellStats(rich_nf(), max),2)))
+      tabla},
+      hover = TRUE, spacing = 'l', align = 'c',
+      digits = 2, striped = TRUE)
 
 
     ### ----------------------------------------------
@@ -196,17 +221,27 @@ shinyServer(
                 margin=FALSE,  par.settings = RdBuTheme)
     })
 
-    ## Evolution time dispersion
-
-    output$richness_disperTime <- renderPlot({
-
+    ## Richness End
+    rich_end <- reactive({
       propagulo_time <- rich_pp() + propagule()*input$timeRange
 
-      rich_time <- calc(stack(landscapeInit(), rasterRich(), propagulo_time),
+      rich_time <- calc(stack(landscapeInit(),
+                              rasterRich(),
+                              propagulo_time),
                         fun = function(x) ifelse(x[1] == pp_value, x[1]*x[3], x[2]))
       rich_time[rich_time== 0] <- NA
 
-      levelplot(stack(rich_time),
+      list(
+        rich_pp_end = propagulo_time,
+        rich_time = rich_time)
+
+    })
+
+
+    ## Evolution time dispersion
+    output$richness_disperTime <- renderPlot({
+      rend <- rich_end()$rich_time
+      levelplot(stack(rend),
                 par.settings = richness_theme, margin = FALSE, pretty=TRUE,
                 scales=list(draw=FALSE), colorkey = list(space = "bottom")) +
         spplot(limit_pp(), fill = "transparent", col = "black",
@@ -216,6 +251,23 @@ shinyServer(
     })
 
 
+    output$rich_table_end <- renderTable({
+      tabla <- cbind(
+        Ecosistema = c("Repoblación de Pinar",
+                       "Repoblación de Pinar final",
+                       "Bosques naturales"),
+        Media = c(round(cellStats(rich_pp(), mean),2),
+                  round(cellStats(rich_end()$rich_pp_end, mean),2),
+                  round(cellStats(rich_nf(), mean),2)),
+        Min = c(round(cellStats(rich_pp(), min), 2),
+                round(cellStats(rich_end()$rich_pp_end, min),2),
+                round(cellStats(rich_nf(), min),2)),
+        Max = c(round(cellStats(rich_pp(), max),2),
+                round(cellStats(rich_end()$rich_pp_end, max),2),
+                round(cellStats(rich_nf(), max),2)))
+      tabla},
+      hover = TRUE, spacing = 'l', align = 'c',
+      digits = 2, striped = TRUE)
 
 
       # invalidateLater(millis = 1000, session)

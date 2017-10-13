@@ -81,7 +81,7 @@ levelplot(myl, att='landuse', scales=list(draw=FALSE),
 myr_range <- as.data.frame(
   cbind(value = c(0,1,2,3),
         lowRich = c(0, 12.82, mean(13.72, 15.62), 1),
-        upRich = c(0, 13.34, mean(16.11, 19.66), 3)))
+        upRich = c(0, 13.34, mean(16.11, 19.66), 2)))
 
 
 ### Raster de distancias. Distancias desde los bordes de las manchas de Natural forest hacia el retso de celdas del espacio
@@ -108,7 +108,158 @@ mapa_riqueza <- initRichness(r = myl,
 
 
 
-plot(mapa_riqueza)
+
+
+
+
+
+
+
+# nf_ri <- calc(stack(myl, mapa_riqueza), function())
+
+
+# rich_pp <- reactive({
+#   calc(stack(landscapeInit(), rasterRich()), fun=function(x) ifelse(x[1] == pp_value, x[1]*x[2], NA))
+# })
+
+nf_value <- 2
+
+rich_nf <- calc(stack(myl, r), fun=function(x) ifelse(x[1] == nf_value, (x[1]/nf_value)*x[2], NA))
+plot(rich_nf)
+cellStats(rich_nf, min)
+cellStats(rich_nf, mean)
+cellStats(rich_nf, max)
+
+crop_value <- 3
+
+rich_crop <- calc(stack(myl, r), fun=function(x) ifelse(x[1] == crop_value, (x[1]/crop_value)*x[2], NA))
+plot(rich_crop)
+cellStats(rich_crop, min)
+cellStats(rich_crop, mean)
+cellStats(rich_crop, max)
+
+pp_value <- 1
+
+rich_pp <- calc(stack(myl, r), fun=function(x) ifelse(x[1] == pp_value, (x[1]/crop_value)*x[2], NA))
+plot(rich_pp)
+cellStats(rich_pp, min)
+cellStats(rich_pp, mean)
+cellStats(rich_pp, max)
+
+rich_nf <- reactive({
+  rich_nf <- calc(stack(myl, r), fun=function(x) ifelse(x[1] == nf_value, (x[1]/nf_value)*x[2], NA))
+  list(
+    min = cellStats(rich_nf, min),
+    mean = cellStats(rich_nf, mean),
+    max = cellStats(rich_nf, max)
+  )
+  })
+
+
+
+
+
+
+
+
+# Natural forest (2)
+aux <- r_range[which(r_range$value == 2), ]
+r[r == 2]  <- sample(aux$lowRich:aux$upRich, ncell(r[r==2]), replace = TRUE)
+
+
+plot(r)
+
+r[r == 0] <- NA
+r[r == 1] <- -100
+r[r == 2] <- -200
+r[r == 3] <- -300
+
+aux <- r_range[which(r_range$value == 2), ]
+r[r == -200]  <- sample(aux$lowRich:aux$upRich, ncell(r[r==-200]), replace = TRUE)
+
+aux <- r_range[which(r_range$value == 3), ]
+r[r == -300]  <- sample(aux$lowRich:aux$upRich, ncell(r[r==-300]), replace = TRUE)
+
+ftreeden <- exp(-0.5*((treedensity - 0.22)/1504.1)^2)
+
+sh <- calc(draster, fun=function(x){1.7605 - 0.0932*(sqrt(sqrt(x)))})
+
+# Create a stack with the shanon diversity raster and landuse raster, and then compute values for pine plantations
+s <- calc(stack(r, sh), fun=function(x)  ifelse(x[1] == -100 , (x[1]/-100)*x[2], NA))
+
+# Scale the distance effect from 0 to 1
+sh_scaled <- (s - cellStats(s, "min"))/(cellStats(s, "max") - cellStats(s, "min"))
+
+## ~ PastUSE
+### Past Land Use
+fplu <- ifelse(pastUse == 'Oak', .9999,
+               ifelse(pastUse == 'Shrubland', .4982,
+                      ifelse(pastUse == 'Crop', .0279, .0001)))
+
+###### ---------------------------------------
+
+## Combine factor to correct pine plantations (OJO!!!!!!!!!!!!!! PESOS)
+f_pine <- (sh_scaled*0.35) + (.45*ftreeden + .2*fplu)
+
+aux <- r_range[which(r_range$value == 1), ]
+r[r == -100]  <- sample(aux$lowRich:aux$upRich, ncell(r[r==-100]), replace = TRUE)
+
+r <- calc(stack(r, f_pine),
+          fun = function(x) ifelse(x[1] == 1, x[1]*x[2], x[1]))
+
+
+
+plot(r)
+plot(sh)
+plot(s)
+
+
+
+
+r
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# nf_ri <- calc(stack(myl, mapa_riqueza), function())
+
+
+# rich_pp <- reactive({
+#   calc(stack(landscapeInit(), rasterRich()), fun=function(x) ifelse(x[1] == pp_value, x[1]*x[2], NA))
+# })
+
+nf_value <- 2
+
+rich_nf <- calc(stack(myl, mapa_riqueza), fun=function(x) ifelse(x[1] == nf_value, (x[1]/nf_value)*x[2], NA))
+plot(rich_nf)
+cellStats(rich_nf, mean)
+
+crop_value <- 3
+
+rich_crop <- calc(stack(myl, mapa_riqueza), fun=function(x) ifelse(x[1] == crop_value, (x[1]/crop_value)*x[2], NA))
+plot(rich_crop)
+cellStats(rich_crop, min)
+
+
+
+
+
+
+
+
+
 
 
 
