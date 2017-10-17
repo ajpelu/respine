@@ -26,6 +26,15 @@ createLandscape <- function(r, size_pp, n_nf, size_nf){
                   size = size_pp,
                   pts = matrix(c(28*2,25*2), nrow=1, ncol=2))
 
+  ## test geometry
+  # pol_pine <- rasterToPolygons(pp, fun=function(x){x==pp_value}, dissolve = TRUE)
+  # centroids <- as.data.frame(getSpPPolygonsLabptSlots(pol_pine))
+  # names(centroids) <- c('x', 'y')
+  # coordinates(centroids) <- ~x+y
+  # pun <- circles(centroids, d=round(sqrt(((size_pp-50))/pi)), lonlat = FALSE)
+  #
+  # pp <- crop(pp, pun@polygons)
+
   # Create natural forest patchs
   nf <- makeClass(pp, val=2, rast=TRUE,
                   npatch=n_nf,
