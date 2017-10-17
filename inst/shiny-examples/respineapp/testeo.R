@@ -46,6 +46,71 @@ pastUse <- 'Oak' # TODO switch past use
 myl <- createLandscape(r, size_pp = size_pp, size_nf = size_nf, n_nf = n_nf)
 
 
+makeClass
+
+pp <- makeClass(r, val=1, npatch = 1, rast=TRUE,
+                size = size_pp,
+                pts = matrix(c(28*2,25*2), nrow=1, ncol=2))
+
+
+
+
+
+puntito <- makeClass(r, val=99, npatch = 1, rast = TRUE,
+                     size = 1,
+                     pts = matrix(c(28*2,25*2), nrow=1, ncol=2))
+
+puntito_v <- rasterToPoints(puntito, fun=function(x){x==99})
+puntitoBuffer <- gBuffer(puntito_v,
+                         width = c(round(sqrt(200/pi)), round(sqrt(200/pi))))
+
+
+pB <- dismo:::.generateCircles(puntito_v, d=round(sqrt(200/pi)), lonlat = FALSE, crs=NA)
+
+
+puntito <- as.data.frame(cbind(x=50, y=56))
+coordinates(puntito)<-~x+y
+pun <- circles(puntito, d=round(sqrt((size_pp-100)/pi)), lonlat = FALSE)
+
+
+
+pp_value <- 1
+pine_limit <- rasterToPolygons(myl, fun=function(x){x==pp_value}, dissolve = TRUE)
+
+
+# get centroid
+centroids <- as.data.frame(getSpPPolygonsLabptSlots(pine_limit))
+names(centroids) <- c('x', 'y')
+coordinates(centroids) <- ~x+y
+pun <- circles(centroids, d=round(sqrt((size_pp)/pi)), lonlat = FALSE)
+
+
+plot(myl)
+plot(pun, add=TRUE)
+
+
+
+pp <- makeClass(r, val=1, npatch = 1, rast=TRUE,
+                size = size_pp,
+                pts = matrix(c(28*2,25*2), nrow=1, ncol=2))
+
+pol_pine <- rasterToPolygons(pp, fun=function(x){x==pp_value}, dissolve = TRUE)
+centroids <- as.data.frame(getSpPPolygonsLabptSlots(pol_pine))
+names(centroids) <- c('x', 'y')
+coordinates(centroids) <- ~x+y
+pun <- circles(centroids, d=round(sqrt(((size_pp-50))/pi)), lonlat = FALSE)
+
+pp <- crop(pp, pun@polygons)
+
+
+
+
+
+
+
+plot(pp)
+plot(pun, add=TRUE)
+
 
 ### 3 ### PLOT LANDSCAPE CREADO
 
