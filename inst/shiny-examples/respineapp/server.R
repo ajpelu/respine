@@ -23,8 +23,8 @@ source('disper_time.R', local=TRUE)
 
 ## Create empty landscape
 set.seed(123)
-ancho <- 53 * 2
-alto <- 63 * 2
+ancho <- 63 * 2
+alto <- 53 * 2
 
 m <- matrix(nrow=alto, ncol=ancho, byrow = T)
 r <- raster(m)
