@@ -66,7 +66,6 @@ body <- dashboardBody(
                          tableOutput("rich_table_end"))
               )
               )
-
     )
 
 
