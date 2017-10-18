@@ -58,18 +58,6 @@ h_plots <- 1000
 shinyServer(
   function(input, output, session){
 
-    # valores <- reactiveValues(
-    #   doPlotInitialMap = 0,
-    #   doRiqueza = 0,
-    #   doTime = 0)
-    #
-    # observeEvent(input$doPaisaje, {
-    #   # 0 will be coerced to FALSE
-    #   # 1+ will be coerced to TRUE
-    #   valores$doPlotInitialMap <- input$doPaisaje
-    #   })
-
-
     ### ----------------------------------------------
     # Density
     den_pp <- reactive ({
@@ -140,10 +128,6 @@ shinyServer(
     })
 
 
-
-
-
-
     ### ----------------------------------------------
     ## Compute dispersion rasters
     rasterDisp <- reactive({
@@ -182,6 +166,37 @@ shinyServer(
       digits = 2, striped = TRUE)
 
 
+    ## Richess Init statistics
+    output$rich_ppInitBox <- renderValueBox({
+      valueBox(
+        value = round(cellStats(rich_pp(), mean),2),
+        subtitle = paste0(
+          round(cellStats(rich_pp(), min),2), " - ",
+          round(cellStats(rich_pp(), max),2)),
+        icon = icon('tree-conifer', lib='glyphicon'), color = 'green')
+    })
+
+    output$rich_nfBox <- renderValueBox({
+      valueBox(
+        value = round(cellStats(rich_nf(), mean),2),
+        subtitle = paste0(
+          round(cellStats(rich_nf(), min),2), " - ",
+          round(cellStats(rich_nf(), max),2)),
+        icon = icon('tree-deciduous', lib='glyphicon'), color = 'yellow')
+    })
+
+    output$rich_ppEndBox <- renderValueBox({
+      valueBox(
+               value = round(cellStats(rich_end()$rich_pp_end, mean),2),
+               subtitle = paste0(
+                 round(cellStats(rich_end()$rich_pp_end, min),2), " - ",
+                 round(cellStats(rich_end()$rich_pp_end, max),2)),
+      icon = icon('tree-conifer', lib='glyphicon'), color = 'olive')
+      })
+
+    # round(cellStats(rich_end()$rich_pp_end, mean),2),
+
+
     ### ----------------------------------------------
     # Endpoints
 
@@ -192,6 +207,7 @@ shinyServer(
           type=5, size=.8)})
 
       output$initial_map <- renderPlot({
+        isolate({
         colores <- c('lightgoldenrod1', # Crops
                          'green', # Natural forests
                          'white', # Other
@@ -206,6 +222,7 @@ shinyServer(
                      xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
                      colorkey = FALSE, lwd=line_pol)
         })
+      })
 
     })
 
@@ -230,7 +247,36 @@ shinyServer(
 
     })
 
+    observeEvent(input$doPropagulo, {
+      output$plotMaps <- renderUI({
+        withSpinner(
+          plotOutput("richness_disper", height = h_plots),
+          type=5, size=.8)})
 
+      output$richness_disper <- renderPlot({
+        levelplot(propagule(),
+                  margin=FALSE,  par.settings = RdBuTheme)
+      })
+    })
+
+    observeEvent(input$doRiquezaEnd, {
+      output$plotMaps <- renderUI({
+        withSpinner(
+          plotOutput("richness_disperTime", height = h_plots),
+          type=5, size=.8)})
+
+      output$richness_disperTime <- renderPlot({
+        rend <- rich_end()$rich_time
+        levelplot(stack(rend),
+                  par.settings = richness_theme, margin = FALSE, pretty=TRUE,
+                  scales=list(draw=FALSE), colorkey = list(space = "bottom")) +
+          spplot(limit_pp(), fill = "transparent", col = "black",
+                 xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
+                 colorkey = FALSE, lwd=line_pol)
+
+      })
+
+    })
 
 
 
@@ -273,10 +319,10 @@ shinyServer(
     # })
 
     ## Propagule Input
-    output$richness_disper <- renderPlot({
-      levelplot(propagule(),
-                margin=FALSE,  par.settings = RdBuTheme)
-    })
+    # output$richness_disper <- renderPlot({
+    #   levelplot(propagule(),
+    #             margin=FALSE,  par.settings = RdBuTheme)
+    # })
 
     ## Richness End
     rich_end <- reactive({
@@ -296,35 +342,35 @@ shinyServer(
 
 
     ## Evolution time dispersion
-    output$richness_disperTime <- renderPlot({
-      rend <- rich_end()$rich_time
-      levelplot(stack(rend),
-                par.settings = richness_theme, margin = FALSE, pretty=TRUE,
-                scales=list(draw=FALSE), colorkey = list(space = "bottom")) +
-        spplot(limit_pp(), fill = "transparent", col = "black",
-               xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
-               colorkey = FALSE, lwd=line_pol)
+    # output$richness_disperTime <- renderPlot({
+    #   rend <- rich_end()$rich_time
+    #   levelplot(stack(rend),
+    #             par.settings = richness_theme, margin = FALSE, pretty=TRUE,
+    #             scales=list(draw=FALSE), colorkey = list(space = "bottom")) +
+    #     spplot(limit_pp(), fill = "transparent", col = "black",
+    #            xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
+    #            colorkey = FALSE, lwd=line_pol)
+    #
+    # })
 
-    })
 
-
-    output$rich_table_end <- renderTable({
-      tabla <- cbind(
-        Ecosistema = c("Repoblación de Pinar",
-                       "Repoblación de Pinar final",
-                       "Bosques naturales"),
-        Media = c(round(cellStats(rich_pp(), mean),2),
-                  round(cellStats(rich_end()$rich_pp_end, mean),2),
-                  round(cellStats(rich_nf(), mean),2)),
-        Min = c(round(cellStats(rich_pp(), min), 2),
-                round(cellStats(rich_end()$rich_pp_end, min),2),
-                round(cellStats(rich_nf(), min),2)),
-        Max = c(round(cellStats(rich_pp(), max),2),
-                round(cellStats(rich_end()$rich_pp_end, max),2),
-                round(cellStats(rich_nf(), max),2)))
-      tabla},
-      hover = TRUE, spacing = 'l', align = 'c',
-      digits = 2, striped = TRUE)
+    # output$rich_table_end <- renderTable({
+    #   tabla <- cbind(
+    #     Ecosistema = c("Repoblación de Pinar",
+    #                    "Repoblación de Pinar final",
+    #                    "Bosques naturales"),
+    #     Media = c(round(cellStats(rich_pp(), mean),2),
+    #               round(cellStats(rich_end()$rich_pp_end, mean),2),
+    #               round(cellStats(rich_nf(), mean),2)),
+    #     Min = c(round(cellStats(rich_pp(), min), 2),
+    #             round(cellStats(rich_end()$rich_pp_end, min),2),
+    #             round(cellStats(rich_nf(), min),2)),
+    #     Max = c(round(cellStats(rich_pp(), max),2),
+    #             round(cellStats(rich_end()$rich_pp_end, max),2),
+    #             round(cellStats(rich_nf(), max),2)))
+    #   tabla},
+    #   hover = TRUE, spacing = 'l', align = 'c',
+    #   digits = 2, striped = TRUE)
 
 
       # invalidateLater(millis = 1000, session)

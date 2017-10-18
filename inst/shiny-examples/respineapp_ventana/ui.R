@@ -15,10 +15,6 @@ header <- dashboardHeader(disable = TRUE)
 # title = "Respine App CC", titleWidth = 300)
 
 sidebar <- dashboardSidebar(disable=TRUE)
-  # width = 300,
-  # h5("Pinar de Repoblación"),
-  #          h5("Bosques naturales")
-  #          )
 
 # Set heigth plots
 h_plots <- 1000
@@ -35,25 +31,32 @@ body <- dashboardBody(
                       choices = c('baja', 'media', 'alta'), selected = 'media'),
           selectInput(inputId = "pp_pastUse", label = "Uso del pasado",
                       choices = c('Bosque natural', 'Matorral', 'Pastizal', 'Cultivo'), selected = 'Matorral'),
+          br(),
+          h5("Bosques naturales"),
           sliderInput(inputId = "n_nf",label = "Nº bosques naturales", min = 1, max= 5, value =2),
           sliderInput(inputId = "size_nf", label = "Tamaño", min = 50, max = 500, value = 250),
-          actionButton("doPaisaje", "Configura Paisaje"), br(), br(),
-          actionButton("doRiquezaInit", "Calcula Riqueza Inicial")
+          actionButton("doPaisaje", "Configura Paisaje"),
+          actionButton("doRiquezaInit", "Riqueza Inicial")
           ),
         box(h4('Dispersantes'),
           sliderInput(inputId = "sb",label = "Aves pequeño tamaño",
                       min = 0, max = 100, value = 0, step = 1),
           uiOutput("mb"),
           tableOutput("disptable"),
-          sliderInput("timeRange", "Número de años:", min=10, max=50, value=30),
-          actionButton("doPropagulo", "Calcula Input Propágulos"), br(), br(),
-          actionButton("doRiquezaEnd", "Calcula Riqueza Final")
+          sliderInput("timeRange", "Número de años simulación:", min=10, max=50, value=30),
+          actionButton("doPropagulo", "Input Propágulos"),
+          actionButton("doRiquezaEnd", "Riqueza Final")
         )
       ),
 
       fluidRow(
-        box(title = "Title 1", width = 6, solidHeader = TRUE, "Box content 1"),
-        box(title = "Title 2", width = 6, solidHeader = TRUE, "Box content 2")
+        infoBoxOutput("rich_ppInitBox"),
+        infoBoxOutput("rich_nfBox"),
+        infoBoxOutput("rich_ppEndBox")
+
+        #valueBox(paste(), "Riqueza Inicial Repoblación", icon = icon('tree-conifer', lib='glyphicon'), color = 'green'),
+        #valueBox(10, "Riqueza Inicial Bosques Naturales", icon = icon('tree-deciduous', lib='glyphicon'), color = 'yellow'),
+        #valueBox(10, "Riqueza Final Repoblación", icon = icon('tree-conifer', lib='glyphicon'), color = 'olive')
         )
       ),
     column(width = 8,
