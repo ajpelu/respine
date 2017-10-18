@@ -50,50 +50,22 @@ body <- dashboardBody(
       ),
 
       fluidRow(
+        box(width=4, "Riqueza Inicial Repoblaciones"),
+        box(width=4, "Riqueza Bosques Naturales"),
+        box(width=4, "Riqueza Final Repoblaciones"),
         infoBoxOutput("rich_ppInitBox"),
         infoBoxOutput("rich_nfBox"),
         infoBoxOutput("rich_ppEndBox")
 
-        #valueBox(paste(), "Riqueza Inicial Repoblación", icon = icon('tree-conifer', lib='glyphicon'), color = 'green'),
-        #valueBox(10, "Riqueza Inicial Bosques Naturales", icon = icon('tree-deciduous', lib='glyphicon'), color = 'yellow'),
-        #valueBox(10, "Riqueza Final Repoblación", icon = icon('tree-conifer', lib='glyphicon'), color = 'olive')
         )
       ),
     column(width = 8,
            box(width = NULL,
                  uiOutput('plotMaps')
-               )
-
-          # wellPanel(uiOutput('plotMaps', height = h_plots))
-
-      # tabBox(width = NULL, side = "right",
-      #        tabPanel("Test Mapas", value = 'panel6',
-      #                 uiOutput('plotMaps')),
-      #
-      #        tabPanel("Paisaje Inicial", value = 'panel2',
-      #                    withSpinner(
-      #                      plotOutput(outputId = 'initial_map', height = h_plots),
-      #                      type=5, size=.8)),
-      #           tabPanel("Mapa de Riqueza Inicial", value = 'panel3',
-      #                    withSpinner(
-      #                      plotOutput(outputId = 'richness_map', height = h_plots),
-      #                      type=5, size = .8),
-      #                    br(),br(),
-      #                    h4('Riqueza Inicial de Especies'),
-      #                    tableOutput("rich_table_init")),
-      #           tabPanel("Input Propágulos", value = 'panel4',
-      #                    withSpinner(
-      #                      plotOutput(outputId = 'richness_disper', height = h_plots),
-      #                      type=5, size = .8)),
-      #           tabPanel("Mapa de Riqueza Tiempo", value = 'panel5',
-      #                    withSpinner(
-      #                      plotOutput(outputId = 'richness_disperTime', height = h_plots),
-      #                      type=5, size = .8),
-      #                    br(),br(),
-      #                    h4('Riqueza Final de Especies'),
-      #                    tableOutput("rich_table_end")))
-      )
-  ))
+              )
+           )
+    )
+  )
 
 
 

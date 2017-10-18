@@ -50,6 +50,9 @@ piMammal = (0.2)/50
 richness_theme <- rasterTheme(region = brewer.pal(9, "YlGn"),
                               axis.line = list(col = "transparent"))
 
+propagule_theme <- rasterTheme(region = brewer.pal(9, "RdBu"),
+                               axis.line = list(col = "transparent"))
+
 # Height for plotOutput
 h_plots <- 1000
 
@@ -194,7 +197,6 @@ shinyServer(
       icon = icon('tree-conifer', lib='glyphicon'), color = 'olive')
       })
 
-    # round(cellStats(rich_end()$rich_pp_end, mean),2),
 
 
     ### ----------------------------------------------
@@ -255,7 +257,8 @@ shinyServer(
 
       output$richness_disper <- renderPlot({
         levelplot(propagule(),
-                  margin=FALSE,  par.settings = RdBuTheme)
+                  margin=FALSE,  par.settings = propagule_theme,
+                  scales=list(draw=FALSE), colorkey = list(space = "bottom"))
       })
     })
 
