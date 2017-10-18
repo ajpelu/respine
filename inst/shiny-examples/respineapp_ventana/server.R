@@ -50,21 +50,24 @@ piMammal = (0.2)/50
 richness_theme <- rasterTheme(region = brewer.pal(9, "YlGn"),
                               axis.line = list(col = "transparent"))
 
+# Height for plotOutput
+h_plots <- 1000
+
 ### -------------------------------
 # SERVER
 shinyServer(
   function(input, output, session){
 
-    valores <- reactiveValues(
-      doPlotInitialMap = 0,
-      doRiqueza = 0,
-      doTime = 0)
-
-    observeEvent(input$doPaisaje, {
-      # 0 will be coerced to FALSE
-      # 1+ will be coerced to TRUE
-      valores$doPlotInitialMap <- input$doPaisaje
-      })
+    # valores <- reactiveValues(
+    #   doPlotInitialMap = 0,
+    #   doRiqueza = 0,
+    #   doTime = 0)
+    #
+    # observeEvent(input$doPaisaje, {
+    #   # 0 will be coerced to FALSE
+    #   # 1+ will be coerced to TRUE
+    #   valores$doPlotInitialMap <- input$doPaisaje
+    #   })
 
 
     ### ----------------------------------------------
@@ -181,41 +184,93 @@ shinyServer(
 
     ### ----------------------------------------------
     # Endpoints
-    ## Initial Map
-    output$initial_map <- renderPlot({
-      if (valores$doPlotInitialMap == 0) return()
-      isolate({
+
+    observeEvent(input$doPaisaje, {
+      output$plotMaps <- renderUI({
+        withSpinner(
+          plotOutput("initial_map", height = h_plots),
+          type=5, size=.8)})
+
+      output$initial_map <- renderPlot({
         colores <- c('lightgoldenrod1', # Crops
-                     'green', # Natural forests
-                     'white', # Other
-                     den_pp()$col) # Pine plantation
-        key_landuses <- list(text = list(lab = c("Cultivos", "Bosques Naturales","Matorrales", "Pinares")),
-                      rectangles=list(col = colores), space='bottom', columns=4)
+                         'green', # Natural forests
+                         'white', # Other
+                         den_pp()$col) # Pine plantation
+            key_landuses <- list(text = list(lab = c("Cultivos", "Bosques Naturales","Matorrales", "Pinares")),
+                                 rectangles=list(col = colores), space='bottom', columns=4)
 
-        levelplot(landscapeInit(), att='landuse', scales=list(draw=FALSE),
-                  col.regions = colores, colorkey=FALSE, key = key_landuses,
-                  par.settings = list(axis.line = list(col = "transparent"))) +
-          spplot(limit_pp(), fill = "transparent", col = "black",
-                 xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
-                 colorkey = FALSE, lwd=line_pol)
+            levelplot(landscapeInit(), att='landuse', scales=list(draw=FALSE),
+                      col.regions = colores, colorkey=FALSE, key = key_landuses,
+                      par.settings = list(axis.line = list(col = "transparent"))) +
+              spplot(limit_pp(), fill = "transparent", col = "black",
+                     xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
+                     colorkey = FALSE, lwd=line_pol)
         })
-      })
 
-    ## Richness Map (initial)
-    output$richness_map <- renderPlot({
-      if (valores$doPlotInitialMap == FALSE) return()
-      isolate({
-        mapa_riqueza <- rasterRich()
-        mapa_riqueza[mapa_riqueza == 0] <- NA
-
-        levelplot(mapa_riqueza, par.settings = richness_theme, margin = FALSE,
-                scales=list(draw=FALSE), pretty=TRUE,
-                colorkey = list(space = "bottom")) +
-        spplot(limit_pp(), fill = "transparent", col = "black",
-               xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
-               colorkey = FALSE, lwd=line_pol)
-      })
     })
+
+    observeEvent(input$doRiquezaInit, {
+      output$plotMaps <- renderUI({
+        withSpinner(
+        plotOutput("richness_map", height = h_plots),
+        type=5, size=.8)})
+
+      output$richness_map <- renderPlot({
+
+          mapa_riqueza <- rasterRich()
+          mapa_riqueza[mapa_riqueza == 0] <- NA
+
+          levelplot(mapa_riqueza, par.settings = richness_theme, margin = FALSE,
+                    scales=list(draw=FALSE), pretty=TRUE,
+                    colorkey = list(space = "bottom")) +
+            spplot(limit_pp(), fill = "transparent", col = "black",
+                   xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
+                   colorkey = FALSE, lwd=line_pol)
+      })
+
+    })
+
+
+
+
+
+
+
+    ## Initial Map
+    # output$initial_map <- renderPlot({
+    #   if (valores$doPlotInitialMap == 0) return()
+    #   isolate({
+    #     colores <- c('lightgoldenrod1', # Crops
+    #                  'green', # Natural forests
+    #                  'white', # Other
+    #                  den_pp()$col) # Pine plantation
+    #     key_landuses <- list(text = list(lab = c("Cultivos", "Bosques Naturales","Matorrales", "Pinares")),
+    #                   rectangles=list(col = colores), space='bottom', columns=4)
+    #
+    #     levelplot(landscapeInit(), att='landuse', scales=list(draw=FALSE),
+    #               col.regions = colores, colorkey=FALSE, key = key_landuses,
+    #               par.settings = list(axis.line = list(col = "transparent"))) +
+    #       spplot(limit_pp(), fill = "transparent", col = "black",
+    #              xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
+    #              colorkey = FALSE, lwd=line_pol)
+    #     })
+    #   })
+
+    # ## Richness Map (initial)
+    # output$richness_map <- renderPlot({
+    #   if (valores$doPlotInitialMap == FALSE) return()
+    #   isolate({
+    #     mapa_riqueza <- rasterRich()
+    #     mapa_riqueza[mapa_riqueza == 0] <- NA
+    #
+    #     levelplot(mapa_riqueza, par.settings = richness_theme, margin = FALSE,
+    #             scales=list(draw=FALSE), pretty=TRUE,
+    #             colorkey = list(space = "bottom")) +
+    #     spplot(limit_pp(), fill = "transparent", col = "black",
+    #            xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
+    #            colorkey = FALSE, lwd=line_pol)
+    #   })
+    # })
 
     ## Propagule Input
     output$richness_disper <- renderPlot({

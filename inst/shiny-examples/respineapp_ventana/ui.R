@@ -37,7 +37,8 @@ body <- dashboardBody(
                       choices = c('Bosque natural', 'Matorral', 'Pastizal', 'Cultivo'), selected = 'Matorral'),
           sliderInput(inputId = "n_nf",label = "Nº bosques naturales", min = 1, max= 5, value =2),
           sliderInput(inputId = "size_nf", label = "Tamaño", min = 50, max = 500, value = 250),
-          actionButton("doPaisaje", "Configura Paisaje")
+          actionButton("doPaisaje", "Configura Paisaje"), br(), br(),
+          actionButton("doRiquezaInit", "Calcula Riqueza Inicial")
           ),
         box(h4('Dispersantes'),
           sliderInput(inputId = "sb",label = "Aves pequeño tamaño",
@@ -45,7 +46,8 @@ body <- dashboardBody(
           uiOutput("mb"),
           tableOutput("disptable"),
           sliderInput("timeRange", "Número de años:", min=10, max=50, value=30),
-          actionButton("doRiqueza", "Calcula Riqueza")
+          actionButton("doPropagulo", "Calcula Input Propágulos"), br(), br(),
+          actionButton("doRiquezaEnd", "Calcula Riqueza Final")
         )
       ),
 
@@ -55,29 +57,39 @@ body <- dashboardBody(
         )
       ),
     column(width = 8,
-      tabBox(width = NULL, side = "right",
-             tabPanel("Paisaje Inicial", value = 'panel2',
-                         withSpinner(
-                           plotOutput(outputId = 'initial_map', height = h_plots),
-                           type=5, size=.8)),
-                tabPanel("Mapa de Riqueza Inicial", value = 'panel3',
-                         withSpinner(
-                           plotOutput(outputId = 'richness_map', height = h_plots),
-                           type=5, size = .8),
-                         br(),br(),
-                         h4('Riqueza Inicial de Especies'),
-                         tableOutput("rich_table_init")),
-                tabPanel("Input Propágulos", value = 'panel4',
-                         withSpinner(
-                           plotOutput(outputId = 'richness_disper', height = h_plots),
-                           type=5, size = .8)),
-                tabPanel("Mapa de Riqueza Tiempo", value = 'panel5',
-                         withSpinner(
-                           plotOutput(outputId = 'richness_disperTime', height = h_plots),
-                           type=5, size = .8),
-                         br(),br(),
-                         h4('Riqueza Final de Especies'),
-                         tableOutput("rich_table_end"))))
+           box(width = NULL,
+                 uiOutput('plotMaps')
+               )
+
+          # wellPanel(uiOutput('plotMaps', height = h_plots))
+
+      # tabBox(width = NULL, side = "right",
+      #        tabPanel("Test Mapas", value = 'panel6',
+      #                 uiOutput('plotMaps')),
+      #
+      #        tabPanel("Paisaje Inicial", value = 'panel2',
+      #                    withSpinner(
+      #                      plotOutput(outputId = 'initial_map', height = h_plots),
+      #                      type=5, size=.8)),
+      #           tabPanel("Mapa de Riqueza Inicial", value = 'panel3',
+      #                    withSpinner(
+      #                      plotOutput(outputId = 'richness_map', height = h_plots),
+      #                      type=5, size = .8),
+      #                    br(),br(),
+      #                    h4('Riqueza Inicial de Especies'),
+      #                    tableOutput("rich_table_init")),
+      #           tabPanel("Input Propágulos", value = 'panel4',
+      #                    withSpinner(
+      #                      plotOutput(outputId = 'richness_disper', height = h_plots),
+      #                      type=5, size = .8)),
+      #           tabPanel("Mapa de Riqueza Tiempo", value = 'panel5',
+      #                    withSpinner(
+      #                      plotOutput(outputId = 'richness_disperTime', height = h_plots),
+      #                      type=5, size = .8),
+      #                    br(),br(),
+      #                    h4('Riqueza Final de Especies'),
+      #                    tableOutput("rich_table_end")))
+      )
   ))
 
 
