@@ -91,16 +91,27 @@ shinyServer(
                   min = 0, max = 100 - input$sb, value = 0)
       })
 
-    disp <- reactive({
-      list(persb = input$sb,
-           permb = input$mb,
-           perma = (100-(input$sb + input$mb)))
+    # disp <- reactive({
+    #   list(persb = input$sb,
+    #        permb = input$mb,
+    #        perma = (100-(input$sb + input$mb)))
+    # })
+
+
+    perma <- reactive({
+      100-(input$sb + input$mb)
     })
 
+    # output$disptable <- renderTable({
+    #   tabla <- cbind(SmallBirds = disp()$persb,
+    #                  MediumBirds = disp()$permb,
+    #                  Mammals = disp()$perma)
+    #   tabla},
+    #   hover = TRUE, spacing = 'xs', align = 'c', digits = 0)
+
     output$disptable <- renderTable({
-      tabla <- cbind(SmallBirds = disp()$persb,
-                     MediumBirds = disp()$permb,
-                     Mammals = disp()$perma)
+      tabla <- cbind(disperser = c('SmallBirds', 'MediumBirds', 'Mammals'),
+                     percentage = c(input$sb, input$mb, perma()))
       tabla},
       hover = TRUE, spacing = 'xs', align = 'c', digits = 0)
 
@@ -144,11 +155,57 @@ shinyServer(
      calc(stack(landscapeInit(), rasterRich()), fun=function(x) ifelse(x[1] == pp_value, x[1]*x[2], NA))
     })
 
-    ## Input propagule
-    propagule <- reactive({
-      # Compute propagule input by cell
-      propagule <- piBird * ((rasterDisp()[['msb']] * disp()$persb) + (rasterDisp()[['mmb']] * disp()$permb)) + (rasterDisp()[['mma']] * disp()$perma) * piMammal
+
+
+    propagule_sb <- reactive({
+      rasterDisp()[['msb']] * as.numeric(input$sb)
     })
+
+    propagule_mb <- reactive({
+      rasterDisp()[['mmb']] * as.numeric(input$mb)
+    })
+
+    propagule_ma <- reactive({
+      rasterDisp()[['mma']] * as.numeric(perma())
+
+    })
+
+
+    propagule_bird_aux <- reactive({
+      calc(stack(propagule_sb(), propagule_mb()),sum)
+    })
+
+    propagule_bird <- reactive({
+      propagule_bird_aux() * piBird
+    })
+
+    propagule_mammal <- reactive({
+      propagule_ma() * piMammal
+    })
+
+    propagule <- reactive({
+      calc(stack(propagule_bird(), propagule_mammal()), sum)
+      })
+
+    # ## Input propagule
+    # propagule <- reactive({
+    #   # Compute propagule input by cell
+    #
+    #   persb <- as.numeric(disp()$persb)
+    #   permb <- as.numeric(disp()$permb)
+    #   perma <- as.numeric(disp()$perma)
+    #
+    #   msb <-
+    #   mmb <- rasterDisp()[['mmb']]
+    #   mma <- rasterDisp()[['mma']]
+    #
+    #
+    #
+    #   propagule <- piBird * ((msb * persb) + (mmb * permb)) + ((mma * perma) * piMammal)
+    #   list(propagule)
+    #
+    #   # propagule <- piBird * ((rasterDisp()[['msb']] * disp()$persb) + (rasterDisp()[['mmb']] * disp()$permb)) + (rasterDisp()[['mma']] * disp()$perma) * piMammal
+    # })
 
 
     ## Richness nf
@@ -181,10 +238,10 @@ shinyServer(
       output$plotMaps <- renderUI({
         withSpinner(
           plotOutput("initial_map", height = h_plots),
-          type=5, size=.8)})
+        type=5, size=.8)
+      })
 
       output$initial_map <- renderPlot({
-        isolate({
         colores <- c('lightgoldenrod1', # Crops
                          'green', # Natural forests
                          'white', # Other
@@ -199,7 +256,6 @@ shinyServer(
               spplot(limit_pp(), fill = "transparent", col = "black",
                      xlim = c(ext()$xmin, ext()$xmax), ylim = c(ext()$ymin, ext()$ymax),
                      colorkey = FALSE, lwd=line_pol)
-        })
       })
 
     })
@@ -261,7 +317,8 @@ shinyServer(
     ### ----------------------------------------------
     ## Richness Info Boxes
     output$rich_ppInitBox <- renderValueBox({
-      valueBox(value = round(cellStats(rich_pp(), mean),2),
+      valueBox(
+               value = round(cellStats(rich_pp(), mean),2),
                subtitle = paste0(
                  round(cellStats(rich_pp(), min),2), " - ",
                  round(cellStats(rich_pp(), max),2)),
