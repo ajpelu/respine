@@ -11,13 +11,13 @@ library('RColorBrewer')
 library('sp')
 library('rgeos')
 
-header <- dashboardHeader(disable = TRUE)
-# title = "Respine App CC", titleWidth = 300)
 
-sidebar <- dashboardSidebar(disable=TRUE)
 
 # Set heigth plots
 h_plots <- 800
+
+header <- dashboardHeader(disable = TRUE)
+sidebar <- dashboardSidebar(disable=TRUE)
 
 body <- dashboardBody(
   fluidRow(
@@ -53,23 +53,13 @@ body <- dashboardBody(
         infoBoxOutput("rich_ppInitBox"),
         infoBoxOutput("rich_nfBox"),
         infoBoxOutput("rich_ppEndBox")
-
         )
       ),
     column(width = 7,
            box(width = NULL,
-                 uiOutput('plotMaps')
-              )
+                 uiOutput('plotMaps'))
            )
     )
   )
 
-
-
-
-
-
-
 dashboardPage(header, sidebar, body, skin = 'green')
-
-
